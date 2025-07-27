@@ -8,7 +8,6 @@ def register():
     data = app.request.json
     if not data or 'username' not in data or 'password' not in data:
         return app.jsonify({"error": "缺少用户名或密码"}), 400
-    
     try:
         # 调用Pan123的认证功能
         pan = Pan123(readfile=False, 
@@ -21,3 +20,6 @@ def register():
         return app.jsonify({"status": "注册成功"})
     except Exception as e:
         return app.jsonify({"error": str(e)}), 500
+    
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>123网盘 - 文件管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@iconify/iconify@3.0.0/dist/iconify.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --secondary-color: #60a5fa;
+      --bg-color: #f3f4f6;
+      --file-item-height: 50px;
+      --header-height: 60px;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .header {
+      height: var(--header-height);
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    }
+
+    .file-item {
+      height: var(--file-item-height);
+      transition: all 0.3s ease;
+      border-radius: 8px;
+    }
+
+    .file-item:hover {
+      background-color: rgba(59, 130, 246, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-item.selected {
+      background-color: rgba(59, 130, 246, 0.2);
+      animation: selectAnimation 0.5s ease;
+    }
+
+    @keyframes selectAnimation {
+      0% {
+        background-color: transparent;
+      }
+
+      50% {
+        background-color: rgba(59, 130, 246, 0.3);
+      }
+
+      100% {
+        background-color: rgba(59, 130, 246, 0.2);
+      }
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn-upload {
+      background: linear-gradient(to right, #10b981, #34d399);
+    }
+
+    .btn-download {
+      background: linear-gradient(to right, #f59e0b, #fbbf24);
+    }
+
+    .floating-menu {
+      transition: all 0.3s ease;
+      transform: translateY(100px);
+    }
+
+    .floating-menu:hover {
+      transform: translateY(0);
+    }
+
+    .grid-view .file-card {
+      transition: all 0.3s ease;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .grid-view .file-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .customization-panel {
+      transition: transform 0.4s ease;
+    }
+
+    .theme-color-option {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .theme-color-option:hover {
+      transform: scale(1.1);
+    }
+
+    .search-box {
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus-within {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <!-- 顶部导航栏 -->
+  <header class="header text-white flex items-center px-6 fixed top-0 left-0 right-0 z-50 shadow-lg">
+    <div class="flex items-center">
+      <i class="fas fa-cloud text-2xl mr-3"></i>
+      <h1 class="text-xl font-bold">123网盘</h1>
+    </div>
+
+    <div class="ml-8 flex-1 max-w-2xl">
+      <div class="search-box glass-effect flex items-center rounded-full px-4 py-2 bg-white bg-opacity-20">
+        <i class="fas fa-search mr-2 text-white opacity-80"></i>
+        <input type="text" placeholder="搜索您的文件..."
+          class="bg-transparent border-none text-white placeholder-white placeholder-opacity-70 w-full focus:outline-none">
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center cursor-pointer">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像"
+          class="w-8 h-8 rounded-full object-cover border-2 border-white">
+        <span class="ml-2">用户_123</span>
+      </div>
+      <button id="customizeBtn" class="p-2 rounded-full hover:bg-white hover:bg-opacity-20">
+        <i class="fas fa-palette"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="pt-24 px-6 pb-20">
+    <!-- 操作工具栏 -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex space-x-3">
+        <button class="btn-primary px-4 py-2 rounded-lg text-white flex items-center">
+          <i class="fas fa-plus mr-2"></i> 新建文件夹
+        </button>
+        <button class="btn-upload px-4 py-2 rounded-lg text-white flex items-center">
+          <i class="fas fa-upload mr-2"></i> 上传文件
+        </button>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center">
+          <span class="mr-2 text-gray-600">视图:</span>
+          <button id="listViewBtn" class="p-2 rounded-lg bg-blue-100 text-blue-600">
+            <i class="fas fa-list"></i>
+          </button>
+          <button id="gridViewBtn" class="p-2 rounded-lg ml-2 text-gray-500 hover:bg-gray-200">
+            <i class="fas fa-grip"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center">
+          <span class="mr-2 text-gray-600">排序:</span>
+          <select
+            class="bg-white rounded-lg px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option>按名称</option>
+            <option>按日期</option>
+            <option>按大小</option>
+            <option>按类型</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 文件列表区 -->
+    <div id="fileContainer" class="list-view">
+      <!-- 文件列表标题 -->
+      <div class="grid grid-cols-12 gap-4 bg-gray-200 px-4 py-3 rounded-t-lg font-medium text-gray-700">
+        <div class="col-span-5">名称</div>
+        <div class="col-span-2">大小</div>
+        <div class="col-span-3">修改日期</div>
+        <div class="col-span-2 text-center">操作</div>
+      </div>
+
+      <!-- 文件列表项 -->
+      <div class="file-item glass-effect grid grid-cols-12 gap-4 items-center px-4 py-3 mb-2 cursor-pointer"
+        onclick="toggleSelect(this)">
+        <div class="col-span-5 flex items-center">
+          <i class="fas fa-folder text-yellow-400 text-xl mr-3"></i>
+          <span>项目文档</span>
+        </div>
+        <div class="col-span-2 text-gray-600">-</div>
+        <div class="col-span-3 text-gray-600">2023-07-25 14:30</div>
+        <div class="col-span-2 flex justify-center space-x-3">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="file-item glass-effect grid grid-cols-12 gap-4 items-center px-4 py-3 mb-2 cursor-pointer"
+        onclick="toggleSelect(this)">
+        <div class="col-span-5 flex items-center">
+          <i class="fas fa-file-pdf text-red-500 text-xl mr-3"></i>
+          <span>项目报告.pdf</span>
+        </div>
+        <div class="col-span-2 text-gray-600">2.4 MB</div>
+        <div class="col-span-3 text-gray-600">2023-07-24 10:15</div>
+        <div class="col-span-2 flex justify-center space-x-3">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="file-item glass-effect grid grid-cols-12 gap-4 items-center px-4 py-3 mb-2 cursor-pointer"
+        onclick="toggleSelect(this)">
+        <div class="col-span-5 flex items-center">
+          <i class="fas fa-file-image text-green-500 text-xl mr-3"></i>
+          <span>设计稿.jpg</span>
+        </div>
+        <div class="col-span-2 text-gray-600">5.7 MB</div>
+        <div class="col-span-3 text-gray-600">2023-07-23 16:45</div>
+        <div class="col-span-2 flex justify-center space-x-3">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="file-item glass-effect grid grid-cols-12 gap-4 items-center px-4 py-3 mb-2 cursor-pointer"
+        onclick="toggleSelect(this)">
+        <div class="col-span-5 flex items-center">
+          <i class="fas fa-file-video text-purple-500 text-xl mr-3"></i>
+          <span>产品演示.mp4</span>
+        </div>
+        <div class="col-span-2 text-gray-600">42.1 MB</div>
+        <div class="col-span-3 text-gray-600">2023-07-22 09:30</div>
+        <div class="col-span-2 flex justify-center space-x-3">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="file-item glass-effect grid grid-cols-12 gap-4 items-center px-4 py-3 mb-2 cursor-pointer"
+        onclick="toggleSelect(this)">
+        <div class="col-span-5 flex items-center">
+          <i class="fas fa-file-excel text-green-600 text-xl mr-3"></i>
+          <span>预算表.xlsx</span>
+        </div>
+        <div class="col-span-2 text-gray-600">1.2 MB</div>
+        <div class="col-span-3 text-gray-600">2023-07-20 11:20</div>
+        <div class="col-span-2 flex justify-center space-x-3">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 瀑布流视图 (默认隐藏) -->
+    <div id="gridView"
+      class="grid-view hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 mt-6">
+      <!-- 瀑布流文件卡片 -->
+      <div class="file-card glass-effect p-4 cursor-pointer" onclick="toggleSelect(this)">
+        <div class="flex justify-center mb-3">
+          <i class="fas fa-folder text-yellow-400 text-5xl"></i>
+        </div>
+        <div class="text-center font-medium truncate">项目文档</div>
+        <div class="text-center text-sm text-gray-600 mt-1">2023-07-25</div>
+        <div class="flex justify-center space-x-3 mt-4">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download text-xs"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="file-card glass-effect p-4 cursor-pointer" onclick="toggleSelect(this)">
+        <div class="flex justify-center mb-3">
+          <i class="fas fa-file-pdf text-red-500 text-5xl"></i>
+        </div>
+        <div class="text-center font-medium truncate">项目报告.pdf</div>
+        <div class="text-center text-sm text-gray-600 mt-1">2.4 MB · 2023-07-24</div>
+        <div class="flex justify-center space-x-3 mt-4">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download text-xs"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="file-card glass-effect p-4 cursor-pointer" onclick="toggleSelect(this)">
+        <div class="flex justify-center mb-3">
+          <i class="fas fa-file-image text-green-500 text-5xl"></i>
+        </div>
+        <div class="text-center font-medium truncate">设计稿.jpg</div>
+        <div class="text-center text-sm text-gray-600 mt-1">5.7 MB · 2023-07-23</div>
+        <div class="flex justify-center space-x-3 mt-4">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download text-xs"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="file-card glass-effect p-4 cursor-pointer" onclick="toggleSelect(this)">
+        <div class="flex justify-center mb-3">
+          <i class="fas fa-file-video text-purple-500 text-5xl"></i>
+        </div>
+        <div class="text-center font-medium truncate">产品演示.mp4</div>
+        <div class="text-center text-sm text-gray-600 mt-1">42.1 MB · 2023-07-22</div>
+        <div class="flex justify-center space-x-3 mt-4">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download text-xs"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="file-card glass-effect p-4 cursor-pointer" onclick="toggleSelect(this)">
+        <div class="flex justify-center mb-3">
+          <i class="fas fa-file-excel text-green-600 text-5xl"></i>
+        </div>
+        <div class="text-center font-medium truncate">预算表.xlsx</div>
+        <div class="text-center text-sm text-gray-600 mt-1">1.2 MB · 2023-07-20</div>
+        <div class="flex justify-center space-x-3 mt-4">
+          <button class="btn-download p-2 rounded-full text-white">
+            <i class="fas fa-download text-xs"></i>
+          </button>
+          <button class="btn-primary p-2 rounded-full text-white">
+            <i class="fas fa-link text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 右下角悬浮菜单 -->
+  <div class="floating-menu fixed bottom-6 right-6 bg-white rounded-xl shadow-xl overflow-hidden z-50">
+    <div class="flex flex-col items-center">
+      <button class="p-4 text-gray-700 hover:bg-blue-50 w-full">
+        <i class="fas fa-share-alt"></i>
+      </button>
+      <button class="p-4 text-gray-700 hover:bg-blue-50 w-full">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+      <button class="p-4 text-gray-700 hover:bg-blue-50 w-full">
+        <i class="fas fa-cog"></i>
+      </button>
+      <button class="p-4 text-gray-700 hover:bg-blue-50 w-full">
+        <i class="fas fa-info-circle"></i>
+      </button>
+    </div>
+    <div class="bg-blue-500 text-white p-4 text-center cursor-pointer">
+      <i class="fas fa-ellipsis-h"></i>
+    </div>
+  </div>
+
+  <!-- 自定义面板 -->
+  <div id="customizationPanel"
+    class="customization-panel fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-50 transform translate-x-full">
+    <div class="p-5 border-b">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold">界面自定义</h2>
+        <button id="closeCustomizeBtn" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="p-5 overflow-y-auto h-full">
+      <div class="mb-6">
+        <h3 class="font-medium text-lg mb-3">主题颜色</h3>
+        <div class="flex flex-wrap gap-3">
+          <div class="theme-color-option bg-blue-500" onclick="changeThemeColor('#3b82f6', '#60a5fa')"></div>
+          <div class="theme-color-option bg-purple-500" onclick="changeThemeColor('#8b5cf6', '#a78bfa')"></div>
+          <div class="theme-color-option bg-green-500" onclick="changeThemeColor('#10b981', '#34d399')"></div>
+          <div class="theme-color-option bg-red-500" onclick="changeThemeColor('#ef4444', '#f87171')"></div>
+          <div class="theme-color-option bg-pink-500" onclick="changeThemeColor('#ec4899', '#f472b6')"></div>
+          <div class="theme-color-option bg-indigo-500" onclick="changeThemeColor('#6366f1', '#818cf8')"></div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-medium text-lg mb-3">背景设置</h3>
+        <div class="space-y-3">
+          <button class="w-full py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+            默认渐变背景
+          </button>
+          <button class="w-full py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+            纯色背景
+          </button>
+          <button class="w-full py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+            图片背景
+          </button>
+          <button class="w-full py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+            视频背景
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-medium text-lg mb-3">布局设置</h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span>文件列表项高度</span>
+            <input type="range" min="40" max="70" value="50" class="w-32">
+          </div>
+          <div class="flex items-center justify-between">
+            <span>顶部导航栏高度</span>
+            <input type="range" min="50" max="80" value="60" class="w-32">
+          </div>
+          <div class="flex items-center justify-between">
+            <span>圆角大小</span>
+            <input type="range" min="0" max="20" value="8" class="w-32">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-medium text-lg mb-3">图标设置</h3>
+        <div class="space-y-3">
+          <select class="w-full p-2 border rounded-lg">
+            <option>Font Awesome (默认)</option>
+            <option>Material Icons</option>
+            <option>Feather Icons</option>
+            <option>自定义图标库</option>
+          </select>
+          <button class="w-full py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+            上传自定义图标
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-medium text-lg mb-3">其他设置</h3>
+        <div class="space-y-2">
+          <div class="flex items-center">
+            <input type="checkbox" id="animationToggle" class="mr-2" checked>
+            <label for="animationToggle">启用动画效果</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="glassEffectToggle" class="mr-2" checked>
+            <label for="glassEffectToggle">启用毛玻璃效果</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="hoverEffectToggle" class="mr-2" checked>
+            <label for="hoverEffectToggle">启用悬停效果</label>
+          </div>
+        </div>
+      </div>
+
+      <button class="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600">
+        应用设置
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 切换视图模式
+    document.getElementById('listViewBtn').addEventListener('click', function () {
+      document.getElementById('fileContainer').classList.remove('hidden');
+      document.getElementById('gridView').classList.add('hidden');
+      this.classList.add('bg-blue-100', 'text-blue-600');
+      document.getElementById('gridViewBtn').classList.remove('bg-blue-100', 'text-blue-600');
+    });
+
+    document.getElementById('gridViewBtn').addEventListener('click', function () {
+      document.getElementById('fileContainer').classList.add('hidden');
+      document.getElementById('gridView').classList.remove('hidden');
+      this.classList.add('bg-blue-100', 'text-blue-600');
+      document.getElementById('listViewBtn').classList.remove('bg-blue-100', 'text-blue-600');
+    });
+
+    // 文件选择效果
+    function toggleSelect(element) {
+      element.classList.toggle('selected');
+    }
+
+    // 打开自定义面板
+    document.getElementById('customizeBtn').addEventListener('click', function () {
+      document.getElementById('customizationPanel').style.transform = 'translateX(0)';
+    });
+
+    // 关闭自定义面板
+    document.getElementById('closeCustomizeBtn').addEventListener('click', function () {
+      document.getElementById('customizationPanel').style.transform = 'translateX(100%)';
+    });
+
+    // 更改主题颜色
+    function changeThemeColor(primary, secondary) {
+      document.documentElement.style.setProperty('--primary-color', primary);
+      document.documentElement.style.setProperty('--secondary-color', secondary);
+
+      // 更新标题栏渐变
+      document.querySelector('.header').style.background =
+        `linear-gradient(to right, ${primary}, ${secondary})`;
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function () {
+      // 设置列表视图按钮为激活状态
+      document.getElementById('listViewBtn').classList.add('bg-blue-100', 'text-blue-600');
+    });
+  </script>
+</body>
+
+</html>

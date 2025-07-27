@@ -7,8 +7,6 @@ import time
 import uuid
 import requests
 
-
-
 class Pan123:
     def __init__(
             self,
@@ -38,7 +36,6 @@ class Pan123:
             "user-agent": "123pan/v2.4.0(Android_7.1.2;Xiaomi)",
             "authorization": self.authorization,
             "accept-encoding": "gzip",
-            # "authorization": "",
             "content-type": "application/json",
             "osversion": "Android_7.1.2",
             "loginuuid": str(uuid.uuid4().hex),
@@ -46,17 +43,12 @@ class Pan123:
             "devicetype": "M2101K9C",
             "x-channel": "1004",
             "devicename": "Xiaomi",
-            # "Content-Length": "65",
             "host": "www.123pan.com",
             "app-version": "61",
             "x-app-version": "2.4.0"
         }
-        self.parent_file_id = 0  # 路径，文件夹的id,0为根目录
+        self.parent_file_id = 0
         self.parent_file_list = [0]
-        res_code_getdir = self.get_dir()
-        if res_code_getdir != 0:
-            self.login()
-            self.get_dir()
 
     def login(self, max_retries=3):
         data = {"type": 1, "passport": self.user_name, "password": self.password}
@@ -716,4 +708,3 @@ class Pan123:
         print(res_json)
         print("创建失败")
         return
-

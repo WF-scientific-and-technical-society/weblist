@@ -1,6 +1,7 @@
 from flask import Flask
-import json
 from pan123 import Pan123
+import json
+import os
 
 app = Flask(__name__)
 @app.route("/api/admin/register", methods=['POST'])
@@ -8,6 +9,17 @@ def register():
     data = app.request.json
     if not data or 'username' not in data or 'password' not in data:
         return app.jsonify({"error": "缺少用户名或密码"}), 400
+    # 配置文件存在性校验
+    if os.path.exists('settings.json') and os.path.getsize('settings.json') > 0:
+        try:
+            with open('settings.json', 'r', encoding='utf-8') as f:
+                existing_settings = json.load(f)
+                if existing_settings.get('username') or existing_settings.get('password'):
+                    return app.jsonify({"error": "The.Setting.Is.Not.NULL"}), 409
+        except json.JSONDecodeError:
+            return app.jsonify({"error": "配置文件格式错误"}), 409
+        except Exception as e:
+            return app.jsonify({"error": str(e)}), 500
     try:
         # 调用Pan123的认证功能
         pan = Pan123(readfile=False, 

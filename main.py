@@ -45,7 +45,9 @@ def login():
                     user_name=data['username'],
                     pass_word=data['password'],
                     input_pwd=False)
-        return jsonify({"status": "登录成功"})
+        return jsonify({
+            "expires_in": "3600"
+            })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileZen - 智能文件管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        :root {
+            --primary: #60a5fa;
+            --primary-dark: #3b82f6;
+            --secondary: #8b5cf6;
+            --background: #ffffff;
+            --surface: #f5f7ff;
+            --surface-light: #eef2ff;
+            --text: #333333;
+            --text-secondary: #666666;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --toolbar-bg: #ffffff;
+            --button-bg: #f1f5f9;
+            --button-hover: #e2e8f0;
+        }
+
+        body.night-mode {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --background: #1a1a1a;
+            --surface: #2d2d2d;
+            --surface-light: #3a3a3a;
+            --text: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --toolbar-bg: #2d2d2d;
+            --button-bg: #3a3a3a;
+            --button-hover: #4a4a4a;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 搜索框样式 */
+        .search-bar {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            animation: fadeIn 0.6s ease;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 100%;
+            font-size: 0.95rem;
+            padding: 8px 15px;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 操作工具栏 */
+        .toolbar {
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            background-color: var(--toolbar-bg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.4s ease;
+        }
+
+        .toolbar-btn {
+            display: flex;
+            align-items: center;
+            background: var(--button-bg);
+            border: none;
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-right: 5px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .toolbar-btn:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .toolbar-btn i {
+            margin-right: 8px;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .view-toggle {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-btn {
+            background: var(--button-bg);
+            border: none;
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-btn:hover {
+            background-color: var(--button-hover);
+        }
+
+        .view-btn.active {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* 文件区域 - 列表布局 */
+        .file-container.list-layout {
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .file-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .file-item {
+            display: grid;
+            grid-template-columns: 40px 1fr 120px 120px;
+            align-items: center;
+            height: 50px;
+            border-radius: var(--border-radius);
+            background: var(--surface);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 0 15px;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: var(--surface-light);
+        }
+
+        .file-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background-color: rgba(96, 165, 250, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .file-name {
+            font-weight: 500;
+            padding-left: 15px;
+        }
+
+        .file-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .file-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--button-bg);
+            color: var(--text);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .file-item.selected {
+            background-color: rgba(96, 165, 250, 0.2);
+            border-left: 3px solid var(--primary);
+        }
+
+        .file-item.selected::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary);
+            opacity: 0.1;
+            z-index: 0;
+            animation: spread 0.5s ease-out;
+        }
+
+        @keyframes spread {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 0.1; transform: scale(1); }
+        }
+
+        /* 文件区域 - 网格布局 */
+        .file-container.grid-layout {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .file-card {
+            background-color: var(--surface);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: rgba(96, 165, 250, 0.3);
+            background: var(--surface-light);
+        }
+
+        .card-icon {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(96, 165, 250, 0.1);
+        }
+
+        .card-icon i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .card-info {
+            padding: 15px;
+        }
+
+        .card-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .card-btn {
+            flex: 1;
+            padding: 6px;
+            border-radius: 6px;
+            background: var(--button-bg);
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .card-btn i {
+            font-size: 0.9rem;
+        }
+        
+        .file-card.selected {
+            border: 2px solid var(--primary);
+        }
+        
+        .file-card.selected::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary);
+            opacity: 0.1;
+            z-index: 0;
+            animation: spread 0.5s ease-out;
+        }
+
+        /* 右下角菜单 */
+        .floating-menu {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .menu-button {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            z-index: 101;
+        }
+
+        .menu-button:hover {
+            transform: rotate(12deg) scale(1.1);
+            box-shadow: 0 6px 16px rgba(96, 165, 250, 0.4);
+        }
+
+        .menu-items {
+            display: none;
+            background: var(--primary);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            min-width: 220px;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: menuAppear 0.4s forwards;
+            z-index: 100;
+        }
+
+        .floating-menu:hover .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: white;
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover i {
+            transform: scale(1.2);
+        }
+
+        /* 设置面板 */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 380px;
+            height: 100vh;
+            background: var(--primary);
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: right 0.4s ease;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: white;
+            color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .settings-group {
+            margin-bottom: 25px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .group-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .group-title i {
+            color: white;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            background: var(--primary);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .color-input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .color-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .bg-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .bg-option {
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-option.active {
+            border: 2px solid white;
+        }
+
+        .bg-option.active::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .bg-option:nth-child(1) { background: #f5f7ff; }
+        .bg-option:nth-child(2) { background: #e0f2ff; }
+        .bg-option:nth-child(3) { background: #e0ffe0; }
+        .bg-option:nth-child(4) { background: #fff9e0; }
+        .bg-option:nth-child(5) { background: #ffe0f7; }
+        .bg-option:nth-child(6) { background: #f0e0ff; }
+        .bg-option:nth-child(7) { background: linear-gradient(135deg, #5a5a5a, #3a3a3a); }
+        .bg-option:nth-child(8) { background: linear-gradient(135deg, #696969, #4a4a4a); }
+        .bg-option:nth-child(9) { background: linear-gradient(135deg, #ff9a9e, #fad0c4); }
+        .bg-option:nth-child(10) { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
+        .bg-option:nth-child(11) { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .bg-option:nth-child(12) { background: linear-gradient(135deg, #f6d365, #fda085); }
+        .bg-option:nth-child(13) { background: linear-gradient(135deg, #6a11cb, #2575fc); }
+        .bg-option:nth-child(14) { background: linear-gradient(135deg, #d4fc79, #96e6a1); }
+        .bg-option:nth-child(15) { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .bg-option:nth-child(16) { background: linear-gradient(135deg, #5ee7df, #b490ca); }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: white;
+            color: var(--primary);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .save-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .save-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(96, 165, 250, 0.1);
+            transform: rotate(30deg);
+            transition: transform 0.6s ease;
+        }
+
+        .save-btn:hover::after {
+            transform: translateY(100%) rotate(30deg);
+        }
+
+        /* 右键菜单 */
+        .context-menu {
+            position: absolute;
+            background: var(--primary);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            z-index: 200;
+            min-width: 200px;
+            overflow: hidden;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .context-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: white;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .context-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .context-menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .context-menu-item i {
+            width: 24px;
+            margin-right: 12px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .context-menu-item.delete {
+            color: #ffcccc;
+        }
+
+        .context-menu-item.delete i {
+            color: #ffcccc;
+        }
+        
+        /* 状态信息栏 */
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            z-index: 90;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .status-selection {
+            margin-left: auto;
+        }
+        
+        /* 动画定义 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes menuAppear {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 10000;
+            animation: fadeIn 0.3s, fadeOut 0.3s 2.7s forwards;
+        }
+        
+        /* 模式切换指示器 */
+        .mode-indicator {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.85rem;
+            z-index: 99;
+            animation: slideDown 0.4s;
+            display: none;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .file-container.grid-layout {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .toolbar-btn span {
+                display: none;
+            }
+            
+            .toolbar-btn i {
+                margin-right: 0;
+            }
+            
+            .settings-panel {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .status-selection {
+                display: none;
+            }
+            
+            .bg-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* 布局修复 */
+        .file-container {
+            display: none;
+        }
+        
+        .file-container.active {
+            display: block;
+        }
+        
+        .grid-layout.active {
+            display: grid;
+        }
+    </style>
+</head>
+<body>
+    <!-- 模式切换指示器 -->
+    <div class="mode-indicator" id="modeIndicator">
+        已切换到 <span id="modeText">日间</span> 模式
+    </div>
+    
+    <!-- 顶部导航栏 -->
+    <header class="header flex items-center justify-between px-6">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-cloud"></i>
+            </div>
+            <h1>FileZen</h1>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" placeholder="搜索文件..." id="searchInput">
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <!-- 昼夜切换按钮 -->
+            <button class="action-btn" id="themeToggle">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+            
+            <!-- 设置按钮 -->
+            <button class="action-btn" id="settingsButton">
+                <i class="fas fa-cog"></i>
+            </button>
+            
+            <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-500">
+                <i class="fas fa-user text-sm"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- 操作工具栏 -->
+    <div class="toolbar">
+        <button class="toolbar-btn" id="uploadBtn">
+            <i class="fas fa-upload"></i>
+            <span>上传</span>
+        </button>
+        <button class="toolbar-btn" id="newFolderBtn">
+            <i class="fas fa-folder-plus"></i>
+            <span>新建文件夹</span>
+        </button>
+        <button class="toolbar-btn" id="deleteBtn">
+            <i class="fas fa-trash-alt"></i>
+            <span>删除</span>
+        </button>
+        <button class="toolbar-btn" id="shareBtn">
+            <i class="fas fa-share-alt"></i>
+            <span>分享</span>
+        </button>
+        
+        <div class="view-toggle">
+            <button class="view-btn active" data-layout="list" id="listViewBtn">
+                <i class="fas fa-list"></i>
+            </button>
+            <button class="view-btn" data-layout="grid" id="gridViewBtn">
+                <i class="fas fa-th-large"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 文件区域 - 列表布局 -->
+    <div class="file-container list-layout active" id="listContainer">
+        <div class="file-list" id="fileList">
+            <!-- 文件夹项 -->
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="fas fa-folder"></i>
+                </div>
+                <div class="file-name">项目文档</div>
+                <div class="file-meta">32 项 · 2023-07-25</div>
+                <div class="file-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 文件项 -->
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="file-name">项目需求文档.pdf</div>
+                <div class="file-meta">2.4 MB · 2023-07-25</div>
+                <div class="file-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="fas fa-file-word"></i>
+                </div>
+                <div class="file-name">设计说明书.docx</div>
+                <div class="file-meta">1.1 MB · 2023-07-24</div>
+                <div class="file-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="fas fa-file-excel"></i>
+                </div>
+                <div class="file-name">项目预算表.xlsx</div>
+                <div class="file-meta">856 KB · 2023-07-23</div>
+                <div class="file-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="fas fa-file-image"></i>
+                </div>
+                <div class="file-name">界面设计稿.png</div>
+                <div class="file-meta">3.2 MB · 2023-07-22</div>
+                <div class="file-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="fas fa-file-code"></i>
+                </div>
+                <div class="file-name">前端代码.zip</div>
+                <div class="file-meta">8.7 MB · 2023-07-21</div>
+                <div class="file-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件区域 - 网格布局 -->
+    <div class="file-container grid-layout" id="gridContainer">
+        <!-- 文件夹卡片 -->
+        <div class="file-card">
+            <div class="card-icon">
+                <i class="fas fa-folder"></i>
+            </div>
+            <div class="card-info">
+                <div class="card-name">项目文档</div>
+                <div class="card-meta">
+                    <span>32 项</span>
+                    <span>2023-07-25</span>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="card-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 文件卡片 -->
+        <div class="file-card">
+            <div class="card-icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+            <div class="card-info">
+                <div class="card-name">项目需求文档.pdf</div>
+                <div class="card-meta">
+                    <span>2.4 MB</span>
+                    <span>2023-07-25</span>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="card-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-card">
+            <div class="card-icon">
+                <i class="fas fa-file-word"></i>
+            </div>
+            <div class="card-info">
+                <div class="card-name">设计说明书.docx</div>
+                <div class="card-meta">
+                    <span>1.1 MB</span>
+                    <span>2023-07-24</span>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="card-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-card">
+            <div class="card-icon">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <div class="card-info">
+                <div class="card-name">项目预算表.xlsx</div>
+                <div class="card-meta">
+                    <span>856 KB</span>
+                    <span>2023-07-23</span>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="card-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-card">
+            <div class="card-icon">
+                <i class="fas fa-file-image"></i>
+            </div>
+            <div class="card-info">
+                <div class="card-name">界面设计稿.png</div>
+                <div class="card-meta">
+                    <span>3.2 MB</span>
+                    <span>2023-07-22</span>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="card-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-card">
+            <div class="card-icon">
+                <i class="fas fa-file-code"></i>
+            </div>
+            <div class="card-info">
+                <div class="card-name">前端代码.zip</div>
+                <div class="card-meta">
+                    <span>8.7 MB</span>
+                    <span>2023-07-21</span>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="card-btn">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右下角浮动菜单 -->
+    <div class="floating-menu">
+        <button class="menu-button" id="floatingMenuBtn">
+            <i class="fas fa-plus"></i>
+        </button>
+        <div class="menu-items">
+            <a href="#" class="menu-item">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>上传文件</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-sync-alt"></i>
+                <span>刷新列表</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-sort-amount-down"></i>
+                <span>排序方式</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-filter"></i>
+                <span>文件过滤</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-info-circle"></i>
+                <span>系统信息</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="panel-header">
+            <h2 class="panel-title">系统设置</h2>
+            <button class="close-btn" id="closeSettings">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="settings-group">
+            <div class="group-title">
+                <i class="fas fa-palette"></i>
+                <span>主题设置</span>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">主色调</label>
+                <div class="color-picker">
+                    <div class="color-preview" id="colorPreview"></div>
+                    <input type="color" class="color-input" id="themeColor" value="#60a5fa">
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">背景设置</label>
+                <div class="bg-options">
+                    <div class="bg-option active" data-bg="light-gray"></div>
+                    <div class="bg-option" data-bg="light-blue"></div>
+                    <div class="bg-option" data-bg="light-green"></div>
+                    <div class="bg-option" data-bg="light-yellow"></div>
+                    <div class="bg-option" data-bg="light-pink"></div>
+                    <div class="bg-option" data-bg="light-purple"></div>
+                    <div class="bg-option" data-bg="gradient-purple"></div>
+                    <div class="bg-option" data-bg="gradient-blue"></div>
+                    <div class="bg-option" data-bg="gradient-orange"></div>
+                    <div class="bg-option" data-bg="gradient-green"></div>
+                    <div class="bg-option" data-bg="gradient-purple-blue"></div>
+                    <div class="bg-option" data-bg="gradient-sunset"></div>
+                    <div class="bg-option" data-bg="gradient-purple-blue-2"></div>
+                    <div class="bg-option" data-bg="gradient-green-2"></div>
+                    <div class="bg-option" data-bg="gradient-pink-red"></div>
+                    <div class="bg-option" data-bg="gradient-blue-purple"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <div class="group-title">
+                <i class="fas fa-layer-group"></i>
+                <span>布局设置</span>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">默认布局</label>
+                <div class="flex gap-4 mt-2">
+                    <button class="bg-option w-1/2 h-14 flex items-center justify-center active" id="listLayout">
+                        <i class="fas fa-list mr-2"></i> 列表布局
+                    </button>
+                    <button class="bg-option w-1/2 h-14 flex items-center justify-center" id="gridLayout">
+                        <i class="fas fa-th-large mr-2"></i> 网格布局
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <div class="group-title">
+                <i class="fas fa-icons"></i>
+                <span>图标设置</span>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">图标库选择</label>
+                <select class="w-full p-3 rounded-lg border bg-surface-light mt-2">
+                    <option>FontAwesome (默认)</option>
+                    <option>Material Icons</option>
+                    <option>Feather Icons</option>
+                    <option>自定义图标库</option>
+                </select>
+            </div>
+        </div>
+        
+        <button class="save-btn">
+            保存设置
+        </button>
+    </div>
+    
+    <!-- 右键上下文菜单 -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" data-action="open">
+            <i class="fas fa-folder-open"></i>
+            <span>打开</span>
+        </div>
+        <div class="context-menu-item" data-action="download">
+            <i class="fas fa-download"></i>
+            <span>下载</span>
+        </div>
+        <div class="context-menu-item" data-action="rename">
+            <i class="fas fa-edit"></i>
+            <span>重命名</span>
+        </div>
+        <div class="context-menu-item" data-action="move">
+            <i class="fas fa-folder"></i>
+            <span>移动到...</span>
+        </div>
+        <div class="context-menu-item" data-action="copy">
+            <i class="fas fa-copy"></i>
+            <span>复制</span>
+        </div>
+        <div class="context-menu-item delete" data-action="delete">
+            <i class="fas fa-trash-alt"></i>
+            <span>删除</span>
+        </div>
+        <div class="context-menu-item" data-action="share">
+            <i class="fas fa-share-alt"></i>
+            <span>分享</span>
+        </div>
+        <div class="context-menu-item" data-action="properties">
+            <i class="fas fa-info-circle"></i>
+            <span>属性</span>
+        </div>
+    </div>
+    
+    <!-- 状态信息栏 -->
+    <div class="status-bar">
+        <span>文件总数: <span id="fileCount">6</span> | 已选: <span id="selectedCount">0</span></span>
+        <span class="status-selection">按 Ctrl 键可多选 | Delete 删除 | Ctrl+A 全选</span>
+    </div>
+
+    <script>
+        // DOM 元素
+        const settingsButton = document.getElementById('settingsButton');
+        const closeSettings = document.getElementById('closeSettings');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const themeColor = document.getElementById('themeColor');
+        const colorPreview = document.getElementById('colorPreview');
+        const listViewBtn = document.getElementById('listViewBtn');
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listContainer = document.getElementById('listContainer');
+        const gridContainer = document.getElementById('gridContainer');
+        const listLayoutBtn = document.getElementById('listLayout');
+        const gridLayoutBtn = document.getElementById('gridLayout');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const contextMenu = document.getElementById('contextMenu');
+        const fileList = document.getElementById('fileList');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const newFolderBtn = document.getElementById('newFolderBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const searchInput = document.getElementById('searchInput');
+        const fileCount = document.getElementById('fileCount');
+        const selectedCount = document.getElementById('selectedCount');
+        const modeIndicator = document.getElementById('modeIndicator');
+        const modeText = document.getElementById('modeText');
+        
+        // 当前选中的文件项
+        let selectedFileItem = null;
+        let currentLayout = 'list';
+        let isCtrlPressed = false;
+        let selectedFiles = new Set();
+        
+        // 初始化主题
+        function initTheme() {
+            const isNightMode = localStorage.getItem('nightMode') === 'true';
+            document.body.classList.toggle('night-mode', isNightMode);
+            themeIcon.classList.toggle('fa-moon', !isNightMode);
+            themeIcon.classList.toggle('fa-sun', isNightMode);
+        }
+        
+        // 切换主题
+        function toggleTheme() {
+            const isNightMode = document.body.classList.toggle('night-mode');
+            localStorage.setItem('nightMode', isNightMode);
+            
+            // 更新图标
+            themeIcon.classList.toggle('fa-moon', !isNightMode);
+            themeIcon.classList.toggle('fa-sun', isNightMode);
+            
+            // 显示模式切换提示
+            modeText.textContent = isNightMode ? '夜间' : '日间';
+            modeIndicator.style.display = 'block';
+            setTimeout(() => {
+                modeIndicator.style.display = 'none';
+            }, 2000);
+        }
+        
+        // 打开设置面板
+        settingsButton.addEventListener('click', () => {
+            settingsPanel.classList.add('open');
+        });
+        
+        // 关闭设置面板
+        closeSettings.addEventListener('click', () => {
+            settingsPanel.classList.remove('open');
+        });
+        
+        // 主题颜色更改
+        themeColor.addEventListener('input', () => {
+            const color = themeColor.value;
+            colorPreview.style.background = color;
+            document.documentElement.style.setProperty('--primary', color);
+            
+            // 更新主色调的深色变体
+            const r = parseInt(color.substr(1, 2), 16);
+            const g = parseInt(color.substr(3, 2), 16);
+            const b = parseInt(color.substr(5, 2), 16);
+            const darkColor = `rgb(${Math.max(0, r - 40)}, ${Math.max(0, g - 40)}, ${Math.max(0, b - 40)})`;
+            document.documentElement.style.setProperty('--primary-dark', darkColor);
+        });
+        
+        // 布局切换
+        function switchLayout(layout) {
+            currentLayout = layout;
+            // 更新按钮状态
+            listViewBtn.classList.remove('active');
+            gridViewBtn.classList.remove('active');
+            
+            // 隐藏所有布局
+            listContainer.classList.remove('active');
+            gridContainer.classList.remove('active');
+            
+            if (layout === 'list') {
+                listViewBtn.classList.add('active');
+                listContainer.classList.add('active');
+            } else {
+                gridViewBtn.classList.add('active');
+                gridContainer.classList.add('active');
+            }
+        }
+        
+        listViewBtn.addEventListener('click', () => {
+            switchLayout('list');
+        });
+        
+        gridViewBtn.addEventListener('click', () => {
+            switchLayout('grid');
+        });
+        
+        // 文件项点击效果
+        function toggleFileSelection(fileItem, isCtrlKey) {
+            if (!isCtrlKey) {
+                // 清除所有选中
+                document.querySelectorAll('.file-item.selected, .file-card.selected').forEach(item => {
+                    item.classList.remove('selected');
+                    selectedFiles.delete(item);
+                });
+            }
+            
+            // 切换当前项选中状态
+            fileItem.classList.toggle('selected');
+            
+            if (fileItem.classList.contains('selected')) {
+                selectedFiles.add(fileItem);
+            } else {
+                selectedFiles.delete(fileItem);
+            }
+            
+            // 更新选中计数
+            updateSelectionCount();
+        }
+        
+        function updateSelectionCount() {
+            selectedCount.textContent = selectedFiles.size;
+            
+            // 更新工具栏按钮状态
+            const hasSelection = selectedFiles.size > 0;
+            deleteBtn.disabled = !hasSelection;
+            shareBtn.disabled = !hasSelection;
+        }
+        
+        // 为文件容器添加事件监听
+        listContainer.addEventListener('click', function(e) {
+            const fileItem = e.target.closest('.file-item');
+            if (fileItem) {
+                toggleFileSelection(fileItem, e.ctrlKey || e.metaKey);
+            }
+        });
+        
+        gridContainer.addEventListener('click', function(e) {
+            const fileCard = e.target.closest('.file-card');
+            if (fileCard) {
+                toggleFileSelection(fileCard, e.ctrlKey || e.metaKey);
+            }
+        });
+        
+        // 点击空白区域取消所有选择
+        document.addEventListener('click', function(e) {
+            const isFileItem = e.target.closest('.file-item, .file-card');
+            const isToolbarBtn = e.target.closest('.toolbar-btn, .action-btn');
+            const isContextMenu = e.target.closest('.context-menu');
+            const isSettingsPanel = e.target.closest('#settingsPanel');
+            
+            if (!isFileItem && !isToolbarBtn && !isContextMenu && !isSettingsPanel) {
+                // 清除所有选中
+                document.querySelectorAll('.file-item.selected, .file-card.selected').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                selectedFiles.clear();
+                updateSelectionCount();
+            }
+        });
+        
+        // 键盘事件
+        document.addEventListener('keydown', function(e) {
+            // 记录Ctrl键状态
+            if (e.key === 'Control' || e.key === 'Meta') {
+                isCtrlPressed = true;
+            }
+            
+            // Delete键删除选中项
+            if (e.key === 'Delete' && selectedFiles.size > 0) {
+                const confirmed = confirm(`确定要删除 ${selectedFiles.size} 个文件吗？`);
+                if (confirmed) {
+                    selectedFiles.forEach(item => {
+                        item.remove();
+                    });
+                    selectedFiles.clear();
+                    updateSelectionCount();
+                    showNotification(`${selectedFiles.size}个文件已删除`);
+                }
+            }
+            
+            // Ctrl+A全选
+            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+                e.preventDefault();
+                
+                const items = currentLayout === 'list' 
+                    ? document.querySelectorAll('.file-item') 
+                    : document.querySelectorAll('.file-card');
+                
+                items.forEach(item => {
+                    item.classList.add('selected');
+                    selectedFiles.add(item);
+                });
+                
+                updateSelectionCount();
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'Control' || e.key === 'Meta') {
+                isCtrlPressed = false;
+            }
+        });
+        
+        // 删除按钮事件
+        deleteBtn.addEventListener('click', function() {
+            if (selectedFiles.size === 0) return;
+            
+            const confirmed = confirm(`确定要删除 ${selectedFiles.size} 个文件吗？`);
+            if (confirmed) {
+                selectedFiles.forEach(item => {
+                    item.remove();
+                });
+                selectedFiles.clear();
+                updateSelectionCount();
+                showNotification(`${selectedFiles.size}个文件已删除`);
+            }
+        });
+        
+        // 上传按钮事件
+        uploadBtn.addEventListener('click', function() {
+            showNotification('上传功能已触发');
+        });
+        
+        // 新建文件夹按钮事件
+        newFolderBtn.addEventListener('click', function() {
+            showNotification('新建文件夹功能已触发');
+        });
+        
+        // 分享按钮事件
+        shareBtn.addEventListener('click', function() {
+            if (selectedFiles.size === 0) return;
+            showNotification(`已分享 ${selectedFiles.size} 个文件`);
+        });
+        
+        // 搜索功能
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            // 列表布局搜索
+            const listItems = document.querySelectorAll('.file-item');
+            listItems.forEach(item => {
+                const fileName = item.querySelector('.file-name').textContent.toLowerCase();
+                item.style.display = fileName.includes(searchTerm) ? 'grid' : 'none';
+            });
+            
+            // 网格布局搜索
+            const gridItems = document.querySelectorAll('.file-card');
+            gridItems.forEach(item => {
+                const fileName = item.querySelector('.card-name').textContent.toLowerCase();
+                item.style.display = fileName.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+        
+        // 背景选项点击
+        document.querySelectorAll('.bg-option').forEach(option => {
+            option.addEventListener('click', function() {
+                if (!this.dataset.bg) return;
+                
+                // 移除所有active类
+                document.querySelectorAll('.bg-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // 添加active类到当前选项
+                this.classList.add('active');
+                
+                const bgType = this.getAttribute('data-bg');
+                let bgStyle = '';
+                
+                switch(bgType) {
+                    case 'light-gray':
+                        bgStyle = '#f5f7ff';
+                        break;
+                    case 'light-blue':
+                        bgStyle = '#e0f2ff';
+                        break;
+                    case 'light-green':
+                        bgStyle = '#e0ffe0';
+                        break;
+                    case 'light-yellow':
+                        bgStyle = '#fff9e0';
+                        break;
+                    case 'light-pink':
+                        bgStyle = '#ffe0f7';
+                        break;
+                    case 'light-purple':
+                        bgStyle = '#f0e0ff';
+                        break;
+                    case 'gradient-purple':
+                        bgStyle = 'linear-gradient(135deg, #5a5a5a, #3a3a3a)';
+                        break;
+                    case 'gradient-blue':
+                        bgStyle = 'linear-gradient(135deg, #696969, #4a4a4a)';
+                        break;
+                    case 'gradient-orange':
+                        bgStyle = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
+                        break;
+                    case 'gradient-green':
+                        bgStyle = 'linear-gradient(135deg, #a1c4fd, #c2e9fb)';
+                        break;
+                    case 'gradient-purple-blue':
+                        bgStyle = 'linear-gradient(135deg, #667eea, #764ba2)';
+                        break;
+                    case 'gradient-sunset':
+                        bgStyle = 'linear-gradient(135deg, #f6d365, #fda085)';
+                        break;
+                    case 'gradient-purple-blue-2':
+                        bgStyle = 'linear-gradient(135deg, #6a11cb, #2575fc)';
+                        break;
+                    case 'gradient-green-2':
+                        bgStyle = 'linear-gradient(135deg, #d4fc79, #96e6a1)';
+                        break;
+                    case 'gradient-pink-red':
+                        bgStyle = 'linear-gradient(135deg, #f093fb, #f5576c)';
+                        break;
+                    case 'gradient-blue-purple':
+                        bgStyle = 'linear-gradient(135deg, #5ee7df, #b490ca)';
+                        break;
+                    default:
+                        bgStyle = '#f5f7ff';
+                }
+                
+                document.body.style.background = bgStyle;
+                showNotification(`背景已更换为 ${bgType.replace(/-/g, ' ')}`);
+            });
+        });
+        
+        // 右键菜单功能实现
+        document.addEventListener('contextmenu', function(e) {
+            // 检查是否点击在文件项上
+            const fileItem = e.target.closest('.file-item, .file-card');
+            if (fileItem) {
+                e.preventDefault();
+                selectedFileItem = fileItem;
+                
+                // 显示菜单
+                contextMenu.style.display = 'block';
+                contextMenu.style.left = `${e.pageX}px`;
+                contextMenu.style.top = `${e.pageY}px`;
+            }
+        });
+        
+        // 菜单项点击事件
+        contextMenu.querySelectorAll('.context-menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const action = this.getAttribute('data-action');
+                let fileName = '';
+                
+                if (selectedFileItem) {
+                    if (selectedFileItem.classList.contains('file-item')) {
+                        fileName = selectedFileItem.querySelector('.file-name').textContent;
+                    } else {
+                        fileName = selectedFileItem.querySelector('.card-name').textContent;
+                    }
+                    
+                    showNotification(`对文件 "${fileName}" 执行了操作: ${action}`);
+                }
+                
+                // 隐藏菜单
+                contextMenu.style.display = 'none';
+            });
+        });
+        
+        // 点击其他地方隐藏菜单
+        document.addEventListener('click', function(e) {
+            if (!contextMenu.contains(e.target)) {
+                contextMenu.style.display = 'none';
+            }
+        });
+        
+        // 显示通知
+        function showNotification(message) {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            colorPreview.style.background = themeColor.value;
+            listLayoutBtn.classList.add('active');
+            
+            // 确保初始只显示列表布局
+            switchLayout('list');
+            
+            // 初始化主题
+            initTheme();
+        });
+        
+        // 添加主题切换事件
+        themeToggle.addEventListener('click', toggleTheme);
+    </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+/* 文件列表容器 */
+.file-list-container {
+    margin-top: 20px;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+/* 文件列表头部 */
+.file-list-header {
+    display: grid;
+    grid-template-columns: 4fr 2fr 1fr 2fr 1fr;
+    padding: 12px 20px;
+    background-color: var(--gray-light);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 14px;
+    border-bottom: 1px solid var(--gray);
+}
+
+.col-name {
+    grid-column: 1;
+}
+
+.col-modified {
+    grid-column: 2;
+    text-align: left;
+}
+
+.col-size {
+    grid-column: 3;
+    text-align: right;
+}
+
+.col-path {
+    grid-column: 4;
+    text-align: left;
+}
+
+.col-actions {
+    grid-column: 5;
+    text-align: right;
+}
+
+/* 文件列表项 */
+.file-item {
+    display: grid;
+    grid-template-columns: 4fr 2fr 1fr 2fr 1fr;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--gray-light);
+    transition: var(--transition);
+    animation: fadeIn 0.2s ease;
+}
+
+.file-item:hover {
+    background-color: var(--gray-light);
+}
+
+.file-item.selected {
+    background-color: rgba(74, 144, 226, 0.1);
+    border-left: 3px solid var(--primary-color);
+}
+
+/* 文件图标和名称 */
+.file-info {
+    display: flex;
+    align-items: center;
+}
+
+.file-icon {
+    font-size: 20px;
+    margin-right: 12px;
+    color: var(--text-secondary);
+}
+
+.file-icon.folder {
+    color: #FFB94E;
+}
+
+.file-icon.document {
+    color: #4E9BFF;
+}
+
+.file-icon.image {
+    color: #FF7D7D;
+}
+
+.file-icon.audio {
+    color: #B77DFF;
+}
+
+.file-icon.video {
+    color: #FF5757;
+}
+
+.file-icon.other {
+    color: var(--text-secondary);
+}
+
+.file-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-modified {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.file-size {
+    color: var(--text-secondary);
+    font-size: 14px;
+    text-align: right;
+}
+
+.file-path {
+    color: var(--text-secondary);
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 文件操作按钮组 */
+.file-item-actions {
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.file-item:hover .file-item-actions {
+    opacity: 1;
+}
+
+.file-action-btn {
+    margin-left: 5px;
+    width: 32px;
+    height: 32px;
+}
+
+/* 列表/网格视图切换 */
+.view-toggle {
+    display: flex;
+    border: 1px solid var(--gray);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.view-toggle-btn {
+    padding: 6px 12px;
+    background-color: var(--white);
+    color: var(--text-secondary);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.view-toggle-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.view-toggle-btn:first-child {
+    border-right: 1px solid var(--gray);
+}
+
+/* 网格视图样式 */
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 15px;
+}
+
+.file-grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.file-grid-item:hover {
+    background-color: var(--gray-light);
+    transform: translateY(-2px);
+}
+
+.file-grid-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.file-grid-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.file-grid-modified {
+    font-size: 12px;
+    color: var(--text-secondary);
+}

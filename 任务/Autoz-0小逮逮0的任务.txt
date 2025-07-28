@@ -172,7 +172,7 @@ Autoz-0小逮逮0 - 配置文件管理与主题系统开发任务清单
 **技术实现规范：**
 
 **后端技术栈：**
-- **Node.js + Express**（配置管理服务）
+- **python + Express**（配置管理服务）
 - **文件监听：** chokidar库
 - **WebSocket：** socket.io
 - **数据验证：** joi或zod

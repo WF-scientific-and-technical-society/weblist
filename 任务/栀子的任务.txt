@@ -13,7 +13,7 @@
 **1.1 项目初始化与架构**
 - **项目结构：**
 ```
-frontend/
+web/
 ├── index.html                 # 主页面
 ├── settings.html             # 设置页面
 ├── css/

@@ -1,6 +1,6 @@
 import json
 import os
-from pan123 import Pan123
+from main import Pan123
 
 # 全局实例
 _pan_instance = None

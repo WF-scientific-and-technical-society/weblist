@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- 
+  html部分在189行
+  注意一下219行和236行和304行
+  js部分在240行
+  js的登陆在258行 
+  从js开始才有注释
+  不要有bug，求你了！！！！！！！！！！！！！！！！
+  -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>weblist管理员登录</title>
+    <!-- 引入Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- 引入FontAwesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            /* 默认浅蓝色 */
+            --background-color: #f5f7fa;
+            /* 默认浅灰色背景 */
+        }
+
+        body {
+            background-color: var(--background-color);
+            background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(255, 255, 255, 0.8) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .login-header {
+            background: var(--primary-color);
+            background: linear-gradient(90deg, var(--primary-color) 0%, #60a5fa 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f9fafb;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+            background-color: white;
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 18px;
+        }
+
+        .btn-login {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            letter-spacing: 1px;
+        }
+
+        .btn-login:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            font-size: 14px;
+        }
+
+        .footer-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #1e40af;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ef4444;
+            background: #fee2e2;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1rem;
+            }
+
+            .login-header {
+                padding: 1.5rem;
+            }
+
+            .logo {
+                width: 70px;
+                height: 70px;
+                line-height: 70px;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <h1 class="text-2xl font-bold">weblist管理系统</h1>
+                <p class="mt-2">管理员登录</p>
+            </div>
+
+            <div class="login-body p-8">
+                <div id="errorMessage" class="error-message">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span id="errorText"></span>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <i class="fas fa-user form-icon"></i>
+                        <input type="text" id="username" class="form-control" placeholder="用户名" required>
+                    </div>
+
+                    <div class="form-group">
+                        <i class="fas fa-lock form-icon"></i>
+                        <input type="password" id="password" class="form-control" placeholder="密码" required>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn-login">
+                            <i class="fas fa-sign-in-alt mr-2"></i><a href="#">登录系统</a>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="footer-links">
+                    <a href="#" class="forgot-password">
+                        <i class="fas fa-key mr-1"></i>忘记密码?
+                    </a>
+                    <a href="#" class="help">
+                        <i class="fas fa-question-circle mr-1"></i>帮助中心
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-6 text-gray-600 text-sm">
+            <p>© 2023 weblist管理系统 | 版本 写前端的不知道</p>
+        </div>
+    </div>
+
+    <script>
+        // 登录表单处理
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // 获取输入值
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // 显示加载状态
+            const loginBtn = document.querySelector('.btn-login');
+            const originalBtnText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>登录中...';
+            loginBtn.disabled = true;
+
+            // 隐藏之前的错误信息
+            document.getElementById('errorMessage').style.display = 'none';
+
+            try {
+                // 调用后端登录API
+                const response = await fetch('api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'settings.json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    if (result.status === 'success') {
+                        // 登录成功，跳转到管理面板
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        // 显示错误信息
+                        showError(result.error || '登录失败，请检查用户名和密码');
+                    }
+                } else {
+                    // 显示错误信息
+                    showError(result.error || '服务器错误，请稍后再试');
+                }
+            } catch (error) {
+                // 网络错误处理
+                showError('网络错误，请检查您的连接');
+                console.error('登录错误:', error);
+            } finally {
+                // 重置按钮状态
+                loginBtn.innerHTML = originalBtnText;
+                loginBtn.disabled = false;
+            }
+        });
+
+        // 显示错误消息
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+
+            errorText.textContent = message;
+            errorElement.style.display = 'block';
+
+            /**
+             *                    _ooOoo_
+             *                   o8888888o
+             *                   88" . "88
+             *                   (| -_- |)
+             *                    O\ = /O
+             *                ____/`---'\____
+             *              .   ' \\| |// `.
+             *               / \\||| : |||// \
+             *             / _||||| -:- |||||- \
+             *               | | \\\ - /// | |
+             *             | \_| ''\---/'' | |
+             *              \ .-\__ `-` ___/-. /
+             *           ___`. .' /--.--\ `. . __
+             *        ."" '< `.___\_<|>_/___.' >'"".
+             *       | | : `- \`.;`\ _ /`;.`/ - ` : | |
+             *         \ \ `-. \_ __\ /__ _/ .-` / /
+             * ======`-.____`-.___\_____/___.-`____.-'======
+             *                    `=---='
+             *
+             * .............................................
+             *          佛祖保佑             永无BUG
+             * 
+             * 我为了不改最上面的注释，都塞在了不影响行数的部分555~
+             */
+
+
+            // 添加抖动动画效果
+            errorElement.animate([
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(-10px)' },
+                { transform: 'translateX(10px)' },
+                { transform: 'translateX(0)' }
+            ], {
+                duration: 300,
+                iterations: 1
+            });
+        }
+
+        // 页面加载时检查是否已登录（简化版）
+        document.addEventListener('DOMContentLoaded', function () {
+            // 在实际应用中，这里会检查本地存储中是否有有效的token
+            // 此处仅为演示，实际实现需要与后端配合
+            /*
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                window.location.href = 'admin-dashboard.html';
+            }
+            */
+        });
+    </script>
+
+
+</body>
+
+</html>

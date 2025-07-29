@@ -77,8 +77,8 @@ def files():
 @app.routr("/api/admin/123pan-login" , methods=['POST'])
 def LogInToTheNetworkDisk():
     data = request.json
-    username = data.username
-    password = data.password
+    username = data['username']
+    password = data['password']
     back = api.login(username , password)
     if(back != ({"status": "success"})):
         return jsonify ({"outcome": "False"}),200

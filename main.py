@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, session
 from pan123 import Pan123
+import api
 import json
 import os
 
@@ -64,6 +65,14 @@ def check():
     if 'username' in session:
         return jsonify({"logged_in": True,"username":session['username']}), 200
     return jsonify({"logged_in": False}), 401
+
+@app.route("/api/files")
+def files():
+    Path = request.args.get('path')
+    api.list_folder(Path)
+    #进入文件目录
+    files = api.list()
+    return jsonify({files}),200
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

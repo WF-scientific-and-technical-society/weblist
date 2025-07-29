@@ -8,31 +8,6 @@
 - 前端个性化通过JSON配置文件实现
 - 管理员可修改设计风格、HTML模板、主题配置等
 
-**第一阶段：后端核心API开发（第1-2周）**
-
-**1.1 管理员认证系统**
-- 单用户注册：POST /api/admin/register
-  参数：{username: string, password: string}
-  限制：仅允许注册一次，已注册返回错误
-  
-- 管理员登录：POST /api/admin/login
-  参数：{username: string, password: string}
-  返回：{token: string, expires_in: 3600}
-
-- 登录状态验证：GET /api/admin/check
-  返回：{logged_in: boolean, username: string}
-
-**1.2 配置文件管理API**
-- 获取当前配置：GET /api/config
-  返回：完整的config.json内容
-  
-- 更新配置：PUT /api/config
-  参数：{config: object}
-  功能：验证并更新JSON配置文件
-  
-- 重置默认配置：POST /api/config/reset
-  功能：恢复默认配置文件
-
 **第二阶段：文件管理API集成（第3-4周）**
 
 **2.1 网盘API封装**

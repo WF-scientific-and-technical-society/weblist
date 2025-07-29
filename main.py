@@ -74,7 +74,7 @@ def files():
     files = api.list()
     return jsonify({files}),200
 
-@app.routr("/api/admin/123pan-login" , methods=['POST'])
+@app.route("/api/admin/123pan-login" , methods=['POST'])
 def LogInToTheNetworkDisk():
     data = request.json
     username = data['username']

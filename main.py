@@ -85,5 +85,16 @@ def LogInToTheNetworkDisk():
     else :
         return jsonify ({"outcome": "Ture"}),200
 
+@app.route("/api/upload")
+def upload():
+    data = request.json
+    path = data['path']
+    file = data['file']
+    back = api.upload(file , path)
+    if(back != ({"status": "success"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "True"}),200
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

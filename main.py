@@ -104,6 +104,15 @@ def download():
         return jsonify ({"outcome": "False"}),200
     else :
         return jsonify ({back}),200
+    
+@app.route("/api/delete")
+def delete():
+    Path = request.args.get('path')
+    back = api.delete(Path)
+    if(back != ({"error": "没有找到对应文件夹或文件"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "True"}),200
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

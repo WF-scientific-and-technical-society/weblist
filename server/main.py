@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, session
 from pan123 import Pan123
+import api
 import json
 import os
 
@@ -64,6 +65,75 @@ def check():
     if 'username' in session:
         return jsonify({"logged_in": True,"username":session['username']}), 200
     return jsonify({"logged_in": False}), 401
+
+@app.route("/api/files")
+def files():
+    Path = request.args.get('path')
+    api.list_folder(Path)
+    #进入文件目录
+    files = api.list()
+    return jsonify({files}),200
+
+@app.route("/api/admin/123pan-login" , methods=['POST'])
+def LogInToTheNetworkDisk():
+    data = request.json
+    username = data['username']
+    password = data['password']
+    back = api.login(username , password)
+    if(back != ({"status": "success"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "Ture"}),200
+
+@app.route("/api/upload")
+def upload():
+    data = request.json
+    path = data['path']
+    file = data['file']
+    back = api.upload(file , path)
+    if(back != ({"status": "success"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "True"}),200
+    
+@app.route("/api/download")
+def download():
+    Path = request.args.get('path')
+    back = api.download(Path)
+    if(back != ({"error": "没有找到对应文件夹或文件"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({back}),200
+    
+@app.route("/api/delete")
+def delete():
+    Path = request.args.get('path')
+    back = api.delete(Path)
+    if(back != ({"error": "没有找到对应文件夹或文件"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "True"}),200
+
+@app.route("/api/folder/create")
+def create_folder():
+    data = request.json
+    path = data['path']
+    folder_name = data['folder_name']
+    back = api.create_folder(folder_name, path)
+    if(back != ({"status": "success"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "True"}),200
+
+@app.route("/api/folder/delete")
+def delete_folder():
+    data = request.json
+    path = data['path']
+    back = api.delete_folder(path)
+    if(back != ({"status": "success"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "True"}),200
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

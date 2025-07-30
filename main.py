@@ -114,5 +114,26 @@ def delete():
     else :
         return jsonify ({"outcome": "True"}),200
 
+@app.route("/api/folder/create")
+def create_folder():
+    data = request.json
+    path = data['path']
+    folder_name = data['folder_name']
+    back = api.create_folder(folder_name, path)
+    if(back != ({"status": "success"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "True"}),200
+
+@app.route("/api/folder/delete")
+def delete_folder():
+    data = request.json
+    path = data['path']
+    back = api.delete_folder(path)
+    if(back != ({"status": "success"})):
+        return jsonify ({"outcome": "False"}),200
+    else :
+        return jsonify ({"outcome": "True"}),200
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

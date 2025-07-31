@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文件管理系统</title>
+    <title>{{config["site"]["title"]}}</title>
     <!-- 引入Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入FontAwesome图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 自定义样式文件 -->
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="../static/css/responsive.css">
+    <link rel="stylesheet" href="../static/css/themes.css">
 </head>
 <body class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
     <!-- 顶部导航栏 -->
@@ -20,7 +20,7 @@
             <!-- 品牌标识 -->
             <div class="flex items-center space-x-2">
                 <i class="fas fa-folder-open text-blue-500 text-xl"></i>
-                <h1 class="text-lg font-semibold text-gray-800">文件管理系统</h1>
+                <h1 class="text-lg font-semibold text-gray-800">{{config["site"]["title"]}}</h1>
             </div>
 
             <!-- 搜索框 -->

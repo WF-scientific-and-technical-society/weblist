@@ -1,9 +1,14 @@
-from flask import Flask
+from flask import Flask, render_template
 from pan123 import Pan123
+from config import config
 import json
 import os
 
 app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return render_template("index.html", config=config)
 @app.route("/api/admin/register", methods=['POST'])
 def register():
     data = app.request.json

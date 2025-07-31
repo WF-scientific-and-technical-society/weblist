@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, session, render_template
 from pan123 import Pan123
-from config import config
+from server.config import config
 import api
 import json
 import os

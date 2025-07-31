@@ -1392,6 +1392,7 @@
             const b = parseInt(color.substr(5, 2), 16);
             const darkColor = `rgb(${Math.max(0, r - 40)}, ${Math.max(0, g - 40)}, ${Math.max(0, b - 40)})`;
             document.documentElement.style.setProperty('--primary-dark', darkColor);
+            document.body.style.backgroundColor = color;
         });
         
         // 布局切换

@@ -1,0 +1,108 @@
+/* 头部导航栏样式 */
+.header {
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--gray-light);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow-sm);
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 20px;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.header-brand-icon {
+    margin-right: 10px;
+    color: var(--primary-color);
+    font-size: 24px;
+}
+
+.header-search {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 20px;
+    position: relative;
+}
+
+.header-search input {
+    width: 100%;
+    height: 40px;
+    border-radius: 20px;
+    border: 1px solid var(--gray);
+    padding: 0 15px 0 40px;
+    background-color: var(--gray-light);
+    transition: var(--transition);
+    color: var(--text-primary);
+}
+
+.header-search input:focus {
+    background-color: var(--white);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.header-search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.header-action-btn {
+    margin-left: 10px;
+}
+
+.notification-btn {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #FF4D4F;
+}
+
+/* 移动端搜索框 */
+.mobile-search {
+    display: none;
+    padding: 10px 20px;
+    background-color: var(--white);
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.mobile-search input {
+    width: 100%;
+    height: 40px;
+    border-radius: 20px;
+    border: 1px solid var(--gray);
+    padding: 0 15px 0 40px;
+    background-color: var(--gray-light);
+    transition: var(--transition);
+}

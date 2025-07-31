@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify, session, render_template
 from pan123 import Pan123
-from server.config import config
+#from config import config
 import api
 import json
 import os
 
-app = Flask(__name__, template_folder='../templates')
+app = Flask(__name__, template_folder='../web/templates')
 app.secret_key = 'd6c8a7f3e409b42d2a5e7c1f8d9b0a3e'
 
 @app.route("/")

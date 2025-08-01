@@ -1,0 +1,85 @@
+/* 响应式断点定义 */
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 992px) {
+    .file-list-header .col-size,
+    .file-item .col-size {
+        display: none;
+    }
+
+    .file-list-header .col-modified,
+    .file-item .col-modified {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-search {
+        display: none;
+    }
+
+    .mobile-search {
+        display: block !important;
+    }
+
+    .file-list-header .col-path,
+    .file-item .col-path {
+        display: none;
+    }
+
+    .toolbar-actions {
+        width: 100%;
+        justify-content: flex-start !important;
+        margin-top: 10px;
+    }
+
+    .view-toggle {
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .header-brand {
+        font-size: 16px;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .btn-icon {
+        margin-right: 0;
+    }
+
+    .file-item-actions {
+        opacity: 1 !important;
+    }
+
+    .fab-menu {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* 响应式工具类 */
+.hide-on-mobile {
+    display: block;
+}
+
+.show-on-mobile {
+    display: none;
+}
+
+@media (max-width: 576px) {
+    .hide-on-mobile {
+        display: none;
+    }
+
+    .show-on-mobile {
+        display: block;
+    }
+}

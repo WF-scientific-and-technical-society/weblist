@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{config["site"]["title"]}}</title>
+    <!-- 引入Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入FontAwesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 自定义样式文件 -->
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="../static/css/responsive.css">
+    <link rel="stylesheet" href="../static/css/themes.css">
+</head>
+<body class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="h-16 bg-white/80 backdrop-blur-md shadow-sm fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 h-full flex items-center justify-between">
+            <!-- 品牌标识 -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-folder-open text-blue-500 text-xl"></i>
+                <h1 class="text-lg font-semibold text-gray-800">{{config["site"]["title"]}}</h1>
+            </div>
+
+            <!-- 搜索框 -->
+            <div class="flex-1 max-w-md mx-8 hidden md:block">
+                <div class="relative">
+                    <input type="text" placeholder="搜索文件..." class="w-full py-2 px-4 pr-10 rounded-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 用户操作区 -->
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600 relative">
+                    <i class="fas fa-bell"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto pt-24 pb-16 px-4">
+        <!-- 工具栏 -->
+        <div class="flex flex-wrap items-center justify-between mb-6 gap-4">
+            <div class="flex items-center space-x-3">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow flex items-center transition-all">
+                    <i class="fas fa-upload mr-2"></i>上传文件
+                </button>
+                <button class="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg shadow border flex items-center transition-all">
+                    <i class="fas fa-folder-plus mr-2"></i>新建文件夹
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <select class="appearance-none bg-white border rounded-lg py-2 pl-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-700">
+                        <option>最近修改</option>
+                        <option>名称</option>
+                        <option>大小</option>
+                        <option>类型</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+
+                <div class="flex border rounded-lg overflow-hidden">
+                    <button class="bg-white hover:bg-gray-50 p-2 text-gray-700 border-r">
+                        <i class="fas fa-th-list"></i>
+                    </button>
+                    <button class="bg-gray-100 hover:bg-gray-200 p-2 text-gray-700">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文件列表区域 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="grid grid-cols-12 py-3 px-4 border-b text-sm font-medium text-gray-500">
+                <div class="col-span-6 md:col-span-4">名称</div>
+                <div class="hidden md:block col-span-2">修改日期</div>
+                <div class="hidden md:block col-span-2">大小</div>
+                <div class="col-span-4 md:col-span-3">位置</div>
+                <div class="col-span-2 md:col-span-1 text-right">操作</div>
+            </div>
+
+            <!-- 文件列表项 - 文件夹 -->
+            <div class="grid grid-cols-12 py-3 px-4 border-b hover:bg-gray-50 group transition-colors">
+                <div class="col-span-6 md:col-span-4 flex items-center space-x-3">
+                    <i class="fas fa-folder text-yellow-500 text-xl"></i>
+                    <span class="font-medium text-gray-800 truncate">项目文档</span>
+                </div>
+                <div class="hidden md:block col-span-2 text-gray-600">2023-11-15</div>
+                <div class="hidden md:block col-span-2 text-gray-600">--</div>
+                <div class="col-span-4 md:col-span-3 text-gray-500 text-sm truncate">/工作文件/项目文档</div>
+                <div class="col-span-2 md:col-span-1 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button class="text-gray-500 hover:text-blue-500 mx-1">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 文件列表项 - 文件 -->
+            <div class="grid grid-cols-12 py-3 px-4 border-b hover:bg-gray-50 group transition-colors">
+                <div class="col-span-6 md:col-span-4 flex items-center space-x-3">
+                    <i class="fas fa-file-pdf text-red-500 text-xl"></i>
+                    <span class="font-medium text-gray-800 truncate">项目计划书.pdf</span>
+                </div>
+                <div class="hidden md:block col-span-2 text-gray-600">2023-11-14</div>
+                <div class="hidden md:block col-span-2 text-gray-600">2.4 MB</div>
+                <div class="col-span-4 md:col-span-3 text-gray-500 text-sm truncate">/工作文件/项目文档</div>
+                <div class="col-span-2 md:col-span-1 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex justify-end space-x-2">
+                        <button class="text-gray-500 hover:text-blue-500">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="text-gray-500 hover:text-blue-500">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button class="text-gray-500 hover:text-blue-500">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 更多文件列表项可以继续添加 -->
+        </div>
+    </main>
+
+    <!-- 右下角功能菜单 -->
+    <div class="fixed bottom-6 right-6 flex flex-col items-end space-y-3">
+        <div class="bg-white rounded-full shadow-lg p-3 hover:bg-gray-50 transition-all cursor-pointer border">
+            <i class="fas fa-cog text-gray-700"></i>
+        </div>
+        <div class="bg-white rounded-full shadow-lg p-3 hover:bg-gray-50 transition-all cursor-pointer border">
+            <i class="fas fa-question-circle text-gray-700"></i>
+        </div>
+        <div class="bg-blue-500 rounded-full shadow-lg p-3 hover:bg-blue-600 transition-all cursor-pointer">
+            <i class="fas fa-plus text-white"></i>
+        </div>
+    </div>
+
+    <!-- JavaScript 文件 -->
+    <script src="js/app.js"></script>
+    <script src="js/components/file-list.js"></script>
+    <script src="js/components/header.js"></script>
+    <script src="js/responsive.js"></script>
+</body>
+</html>

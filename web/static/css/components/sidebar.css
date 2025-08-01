@@ -1,0 +1,137 @@
+/* 侧边栏容器 */
+.sidebar {
+    width: 240px;
+    background-color: var(--white);
+    border-right: 1px solid var(--gray-light);
+    height: calc(100vh - 60px);
+    position: fixed;
+    top: 60px;
+    left: 0;
+    z-index: 900;
+    transition: var(--transition);
+    overflow-y: auto;
+}
+
+.sidebar.collapsed {
+    width: 60px;
+}
+
+/* 侧边栏菜单 */
+.sidebar-menu {
+    padding: 20px 0;
+}
+
+.sidebar-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sidebar-menu-item:hover {
+    background-color: var(--gray-light);
+    color: var(--primary-color);
+}
+
+.sidebar-menu-item.active {
+    background-color: rgba(74, 144, 226, 0.1);
+    color: var(--primary-color);
+    border-left: 3px solid var(--primary-color);
+}
+
+.sidebar-menu-icon {
+    font-size: 18px;
+}
+
+.sidebar-menu-text {
+    margin-left: 12px;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-menu-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-menu-item {
+    justify-content: center;
+    padding: 15px 0;
+}
+
+/* 侧边栏分隔线 */
+.sidebar-divider {
+    margin: 15px 0;
+    border-top: 1px solid var(--gray-light);
+}
+
+/* 侧边栏标题 */
+.sidebar-title {
+    padding: 0 20px 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+}
+
+.sidebar.collapsed .sidebar-title {
+    display: none;
+}
+
+/* 侧边栏底部 */
+.sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    border-top: 1px solid var(--gray-light);
+    background-color: var(--white);
+}
+
+.sidebar-toggle-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: var(--border-radius);
+    background-color: var(--gray-light);
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: var(--gray);
+    color: var(--text-primary);
+}
+
+/* 响应式侧边栏 */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        z-index: 1100;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1050;
+        display: none;
+    }
+
+    .sidebar-backdrop.show {
+        display: block;
+    }
+}

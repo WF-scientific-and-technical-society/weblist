@@ -1,0 +1,85 @@
+/* 默认主题 - 已在main.css中定义 */
+
+/* 深色主题变量 */
+[data-theme="dark"] {
+    --primary-color: #5B9BFF;
+    --primary-dark: #4A8AE0;
+    --primary-light: #7CB5FF;
+    --bg-color: #1A1A2E;
+    --bg-gradient: linear-gradient(to bottom, #1A1A2E, #16213E);
+    --text-primary: #E6E6E6;
+    --text-secondary: #B8B8B8;
+    --white: #2A2A40;
+    --gray-light: #3A3A56;
+    --gray: #4A4A66;
+    --gray-dark: #5A5A76;
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.2);
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 主题切换动画 */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 高对比度主题 */
+[data-theme="high-contrast"] {
+    --primary-color: #005FFF;
+    --primary-dark: #0040CC;
+    --primary-light: #3385FF;
+    --bg-color: #FFFFFF;
+    --bg-gradient: linear-gradient(to bottom, #FFFFFF, #F0F0F0);
+    --text-primary: #000000;
+    --text-secondary: #333333;
+    --white: #FFFFFF;
+    --gray-light: #E0E0E0;
+    --gray: #CCCCCC;
+    --gray-dark: #999999;
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 主题切换按钮样式 */
+.theme-toggle {
+    position: relative;
+    width: 50px;
+    height: 26px;
+}
+
+.theme-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--gray);
+    transition: .4s;
+    border-radius: 26px;
+}
+
+.theme-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .theme-slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .theme-slider:before {
+    transform: translateX(24px);
+}

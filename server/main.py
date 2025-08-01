@@ -1,9 +1,13 @@
 from flask import Flask, request, jsonify, session, render_template
 from pan123 import Pan123
-from config import config
 import api
 import json
 import os
+
+
+with open(os.path.join(os.path.dirname(__file__), '..', 'config.json'),
+          'r', encoding='utf-8') as f:
+    config = json.load(f)
 
 app = Flask(__name__, template_folder='../web',
             static_folder='../web/static',

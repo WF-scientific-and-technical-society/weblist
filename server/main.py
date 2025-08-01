@@ -94,7 +94,7 @@ def LogInToTheNetworkDisk():
     if(back != ({"status": "success"})):
         return jsonify ({"outcome": "False"}),200
     else :
-        return jsonify ({"outcome": "Ture"}),200
+        return jsonify ({"outcome": "True"}),200
 
 @app.route("/api/upload")
 def upload():

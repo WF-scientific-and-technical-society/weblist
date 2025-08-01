@@ -5,7 +5,9 @@ import api
 import json
 import os
 
-app = Flask(__name__, template_folder='../web', static_folder='../web/static', static_url_path='')
+app = Flask(__name__, template_folder='../web',
+            static_folder='../web/static',
+            static_url_path='')
 app.secret_key = 'd6c8a7f3e409b42d2a5e7c1f8d9b0a3e'
 
 @app.route("/")

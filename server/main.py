@@ -24,16 +24,16 @@ def register():
     if not data or 'username' not in data or 'password' not in data:
         return jsonify({"error": "缺少用户名或密码"}), 400
     # 配置文件存在性校验
-    if os.path.exists('settings.json') and os.path.getsize(
-        'settings.json'
+    if os.path.exists('User-account-password.json') and os.path.getsize(
+        'User-account-password.json'
         ) > 0:
         try:
-            with open('settings.json', 'r', encoding='utf-8') as f:
+            with open('User-account-password.json', 'r', encoding='utf-8') as f:
                 existing_settings = json.load(f)
                 if existing_settings.get('username') or existing_settings.get(
                     'password'
                     ):
-                    return jsonify({"error": "The.Setting.Is.Not.NULL"}), 409
+                    return jsonify({"error": "The.User-account-password.json.Is.Not.NULL"}), 409
         except json.JSONDecodeError:
             return app.jsonify({"error": "配置文件格式错误"}), 409
         except Exception as e:
@@ -45,7 +45,7 @@ def register():
                     pass_word=data['password'],
                     input_pwd=False)
         # 保存凭证到配置文件
-        with open('settings.json', 'w', encoding='utf-8') as f:
+        with open('User-account-password.json', 'w', encoding='utf-8') as f:
             json.dump({
                 'username': data['username'],
                 'password': data['password']},

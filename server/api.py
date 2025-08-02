@@ -12,8 +12,11 @@ def _get_pan_instance():
         # 读取The-password-of-the-user-account-of-the-network-disk.json配置文件
         settings_path = "The-password-of-the-user-account-of-the-network-disk.json"
         if os.path.exists(settings_path):
-            with open(settings_path, 'r', encoding='utf-8') as f:
-                settings = json.load(f)
+            try:
+                with open(settings_path, 'r', encoding='utf-8') as f:
+                    settings = json.load(f)
+            except FileExistsError:
+                raise "NO.USER"
         else:
             settings = {}
         

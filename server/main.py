@@ -65,7 +65,7 @@ def login():
             data = json.load(f)
             if data.get('username') == request.json.get('username') and data.get('password') == request.json.get('password'):
                 session['username'] = data['username']
-                return jsonify({"status": "登录成功"})
+                return jsonify({"expires_in": "3600"})
             else:
                 return jsonify({"error": "用户名或密码错误"}), 401
     except Exception as e:

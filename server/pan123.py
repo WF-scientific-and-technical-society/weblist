@@ -23,12 +23,7 @@ class Pan123:
             self.read_ini(user_name, pass_word, input_pwd, authorization)
         else:
             if user_name == "" or pass_word == "":
-                print("读取已禁用，用户名或密码为空")
-                if input_pwd:
-                    user_name = input("请输入用户名:")
-                    pass_word = input("请输入密码:")
-                else:
-                    raise Exception("用户名或密码为空：读取禁用时，用户名和密码不能为空")
+                raise Exception("NO.123.DISK.USER")
             self.user_name = user_name
             self.password = pass_word
             self.authorization = authorization
@@ -651,7 +646,6 @@ class Pan123:
             authorization = text["authorization"]
 
         except:  # FileNotFoundError or json.decoder.JSONDecodeError:
-
             if user_name == "" or pass_word == "":
                 if input_pwd:
                     user_name = input("userName:")

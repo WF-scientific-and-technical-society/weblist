@@ -9,8 +9,8 @@ def _get_pan_instance():
     """获取Pan123实例，如果未初始化则初始化"""
     global _pan_instance
     if _pan_instance is None:
-        # 读取settings.json配置文件
-        settings_path = "settings.json"
+        # 读取The-password-of-the-user-account-of-the-network-disk.json配置文件
+        settings_path = "The-password-of-the-user-account-of-the-network-disk.json"
         if os.path.exists(settings_path):
             with open(settings_path, 'r', encoding='utf-8') as f:
                 settings = json.load(f)
@@ -62,14 +62,14 @@ def login(username=None, password=None):
     登录123pan
     
     参数:
-        username: 用户名，如果为None则从settings.json读取
-        password: 密码，如果为None则从settings.json读取
+        username: 用户名，如果为None则从The-password-of-the-user-account-of-the-network-disk.json读取
+        password: 密码，如果为None则从The-password-of-the-user-account-of-the-network-disk.json读取
     
     返回:
         {"status": "success"} 或 {"error": "错误信息"}
     """
     try:
-        settings_path = "settings.json"
+        settings_path = "The-password-of-the-user-account-of-the-network-disk.json"
         settings = {}
         
         if os.path.exists(settings_path):
@@ -83,7 +83,7 @@ def login(username=None, password=None):
         if not use_username or not use_password:
             return {"error": "用户名或密码未提供"}
         
-        # 只有在提供了新凭据时才更新settings.json
+        # 只有在提供了新凭据时才更新The-password-of-the-user-account-of-the-network-disk.json
         if username and password:
             settings["username"] = username
             settings["password"] = password
@@ -92,8 +92,12 @@ def login(username=None, password=None):
         
         # 创建新的Pan123实例并登录
         global _pan_instance
-        _pan_instance = Pan123(readfile=False, user_name=use_username, pass_word=use_password)
-        
+        try:
+            _pan_instance = Pan123(readfile=False, user_name=use_username, pass_word=use_password)
+        except "NO.123.DISK.USER":
+            return {"error": "未注册"}
+        except Exception as e:
+            return {"error": str(e)}
         return {"status": "success"}
     except Exception as e:
         return {"error": str(e)}
@@ -112,8 +116,8 @@ def list():
     try:
         pan = _get_pan_instance()
         
-        # 检查settings.json中的default-path
-        settings_path = "settings.json"
+        # 检查The-password-of-the-user-account-of-the-network-disk.json.json.json.json中的default-path
+        settings_path = "The-password-of-the-user-account-of-the-network-disk.json"
         default_path = None
         if os.path.exists(settings_path):
             with open(settings_path, 'r', encoding='utf-8') as f:

@@ -80,7 +80,10 @@ def check():
 @app.route("/api/files")
 def files():
     Path = request.args.get('path')
-    api.list_folder(Path)
+    try:
+        api.list_folder(Path)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     #进入文件目录
     files = api.list()
     return jsonify({files}),200

@@ -68,6 +68,8 @@ def login():
                 return jsonify({"expires_in": "3600"})
             else:
                 return jsonify({"error": "用户名或密码错误"}), 401
+    except FileExistsError:
+        return jsonify({"error": "NO.USER"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

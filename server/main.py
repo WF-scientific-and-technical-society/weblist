@@ -61,16 +61,16 @@ def login():
     if not data or 'username' not in data or 'password' not in data:
         return jsonify({"error": "缺少用户名或密码"}), 400
     try:
-        pan = Pan123(readfile=False, 
-                    user_name=data['username'],
-                    pass_word=data['password'],
-                    input_pwd=False)
-        session['username'] = data['username']  # 新增session存储
-        return jsonify({"expires_in": "3600"}
-        )
+        with open('User-account-password.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if data.get('username') == request.json.get('username') and data.get('password') == request.json.get('password'):
+                session['username'] = data['username']
+                return jsonify({"status": "登录成功"})
+            else:
+                return jsonify({"error": "用户名或密码错误"}), 401
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 @app.route("/api/admin/check")
 def check():
     if 'username' in session:

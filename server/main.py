@@ -82,7 +82,10 @@ def check():
 @app.route("/api/files")
 def files():
     Path = request.args.get('path')
-    api.list_folder(Path)
+    try:
+        api.list_folder(Path)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     #进入文件目录
     files = api.list()
     return jsonify({files}),200
@@ -90,13 +93,18 @@ def files():
 @app.route("/api/admin/123pan-login" , methods=['POST'])
 def LogInToTheNetworkDisk():
     data = request.json
-    username = data['username']
-    password = data['password']
-    back = api.login(username , password)
-    if(back != ({"status": "success"})):
-        return jsonify ({"outcome": "False"}),200
-    else :
-        return jsonify ({"outcome": "True"}),200
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({"error": "缺少用户名或密码"}), 400
+    try:
+        pan = Pan123(readfile=False, 
+                    user_name=data['username'],
+                    pass_word=data['password'],
+                    input_pwd=False)
+        session['username'] = data['username']  # 新增session存储
+        return jsonify({"expires_in": "3600"}
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/upload")
 def upload():

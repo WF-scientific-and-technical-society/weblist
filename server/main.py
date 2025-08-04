@@ -88,7 +88,7 @@ def files():
         return jsonify({"error": str(e)}), 500
     #进入文件目录
     files = api.list()
-    return jsonify({files}),200
+    return jsonify(files),200
 
 @app.route("/api/admin/123pan-login" , methods=['POST'])
 def LogInToTheNetworkDisk():

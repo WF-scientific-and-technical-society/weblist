@@ -60,18 +60,153 @@ Autoz-0小逮逮0 - 配置文件管理与主题系统开发任务清单
 **1.2 配置管理API**
 - **读取配置：**
   - GET /api/config - 获取完整配置
+    请求示例：
+    ```
+    GET /api/config
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "site": {"title": "个人网盘", ...},
+      "theme": {"primary_color": "#1890ff", ...},
+      "layout": {"header_html": "<header...", ...},
+      ...
+    }
+    ```
   - GET /api/config/:section - 获取特定配置段
+    请求示例：
+    ```
+    GET /api/config/theme
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "primary_color": "#1890ff",
+      "secondary_color": "#52c41a",
+      "background_color": "#f5f5f5",
+      ...
+    }
+    ```
   - GET /api/config/schema - 获取配置schema
+    请求示例：
+    ```
+    GET /api/config/schema
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "type": "object",
+      "properties": {
+        "site": {"type": "object", ...},
+        "theme": {"type": "object", ...},
+        ...
+      },
+      "required": ["site", "theme"]
+    }
+    ```
 
 - **更新配置：**
   - PUT /api/config - 全量更新配置
+    请求示例：
+    ```json
+    {
+      "site": {"title": "我的网盘", ...},
+      "theme": {"primary_color": "#333333", ...},
+      ...
+    }
+    ```
+    返回示例：
+    ```json
+    {
+      "status": "success",
+      "message": "配置已更新",
+      "version": "v2"
+    }
+    ```
   - PATCH /api/config/:section - 增量更新配置段
+    请求示例：
+    ```json
+    {
+      "primary_color": "#40a9ff",
+      "secondary_color": "#73d13d"
+    }
+    ```
+    返回示例：
+    ```json
+    {
+      "status": "success",
+      "message": "主题配置已更新",
+      "updated_fields": ["primary_color", "secondary_color"]
+    }
+    ```
   - POST /api/config/validate - 验证配置格式
+    请求示例：
+    ```json
+    {
+      "theme": {
+        "primary_color": "#invalid-color",
+        "secondary_color": "#52c41a"
+      }
+    }
+    ```
+    返回示例：
+    ```json
+    {
+      "valid": false,
+      "errors": [{
+        "field": "theme.primary_color",
+        "message": "无效的颜色代码"
+      }]
+    }
+    ```
 
 - **配置管理：**
   - POST /api/config/backup - 创建配置备份
+    请求示例：
+    ```
+    POST /api/config/backup
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "status": "success",
+      "backup_id": "b12345",
+      "timestamp": "2024-03-20T10:30:00Z"
+    }
+    ```
   - GET /api/config/backups - 获取备份列表
+    请求示例：
+    ```
+    GET /api/config/backups
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "backups": [
+        {"id": "b12345", "timestamp": "2024-03-20T10:30:00Z", "size": "2KB"},
+        {"id": "b12344", "timestamp": "2024-03-19T10:30:00Z", "size": "2KB"}
+      ]
+    }
+    ```
   - POST /api/config/restore/:backup_id - 恢复备份
+    请求示例：
+    ```
+    POST /api/config/restore/b12345
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "status": "success",
+      "message": "配置已恢复到备份b12345",
+      "version": "v1"
+    }
+    ```
 
 **第二阶段：主题系统开发（第3-4周）**
 
@@ -189,20 +324,174 @@ Autoz-0小逮逮0 - 配置文件管理与主题系统开发任务清单
 **配置管理API：**
 - **基础操作：**
   - GET /api/config - 获取配置
+    请求示例：
+    ```
+    GET /api/config
+    Authorization: Bearer <access_token>
+    ```
   - PUT /api/config - 更新配置
+    请求示例：
+    ```json
+    {
+      "site": {"title": "我的网盘", ...},
+      "theme": {"primary_color": "#333333", ...},
+      ...
+    }
+    ```
   - PATCH /api/config/:section - 更新配置段
+    请求示例：
+    ```json
+    {
+      "primary_color": "#40a9ff",
+      "secondary_color": "#73d13d"
+    }
+    ```
   - POST /api/config/validate - 验证配置
+    请求示例：
+    ```json
+    {
+      "theme": {
+        "primary_color": "#1890ff",
+        "secondary_color": "#52c41a"
+      }
+    }
+    ```
 
 - **主题管理：**
   - GET /api/themes - 获取主题列表
+    请求示例：
+    ```
+    GET /api/themes
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "themes": [
+        {"id": "1", "name": "默认主题", "preview": "/theme-preview/1"},
+        {"id": "2", "name": "深色主题", "preview": "/theme-preview/2"}
+      ]
+    }
+    ```
   - POST /api/themes - 创建新主题
+    请求示例：
+    ```json
+    {
+      "name": "自定义主题",
+      "config": {
+        "primary_color": "#ff4d4f",
+        "secondary_color": "#faad14",
+        "background_color": "#ffffff",
+        ...
+      }
+    }
+    ```
+    返回示例：
+    ```json
+    {
+      "status": "success",
+      "theme_id": "3",
+      "preview_url": "/theme-preview/3"
+    }
+    ```
   - PUT /api/themes/:id - 更新主题
+    请求示例：
+    ```json
+    {
+      "name": "更新的深色主题",
+      "config": {
+        "primary_color": "#1890ff",
+        "secondary_color": "#52c41a",
+        ...
+      }
+    }
+    ```
+    返回示例：
+    ```json
+    {
+      "status": "success",
+      "message": "主题已更新",
+      "theme_id": "2"
+    }
+    ```
   - DELETE /api/themes/:id - 删除主题
+    请求示例：
+    ```
+    DELETE /api/themes/3
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "status": "success",
+      "message": "主题已删除",
+      "theme_id": "3"
+    }
+    ```
 
 - **配置历史：**
   - GET /api/config/history - 配置变更历史
+    请求示例：
+    ```
+    GET /api/config/history?limit=10&offset=0
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "history": [
+        {
+          "version": "v2",
+          "timestamp": "2024-03-20T10:30:00Z",
+          "user": "admin",
+          "changes": ["theme.primary_color", "site.title"]
+        },
+        {
+          "version": "v1",
+          "timestamp": "2024-03-19T10:30:00Z",
+          "user": "admin",
+          "changes": ["upload.max_file_size"]
+        }
+      ]
+    }
+    ```
   - POST /api/config/rollback/:version - 回滚到指定版本
+    请求示例：
+    ```
+    POST /api/config/rollback/v1
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "status": "success",
+      "message": "配置已回滚到版本v1",
+      "current_version": "v3"
+    }
+    ```
   - GET /api/config/diff/:from/:to - 配置差异对比
+    请求示例：
+    ```
+    GET /api/config/diff/v1/v2
+    Authorization: Bearer <access_token>
+    ```
+    返回示例：
+    ```json
+    {
+      "diff": [
+        {
+          "path": "theme.primary_color",
+          "from": "#1890ff",
+          "to": "#333333"
+        },
+        {
+          "path": "site.title",
+          "from": "个人网盘",
+          "to": "我的网盘"
+        }
+      ]
+    }
+    ```
 
 **实时通信：**
 - **WebSocket事件：**

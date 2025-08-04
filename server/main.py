@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, session, render_template
-from pan123 import Pan123
+from .pan123 import Pan123
 import api
 import json
 import os

@@ -3,7 +3,8 @@ from pan123 import Pan123
 import api
 import json
 import os
-
+import threading
+from task.task_start import background_task  # 导入后台任务函数喵～
 
 with open(os.path.join(os.path.dirname(__file__), '..', 'config.json'),
           'r', encoding='utf-8') as f:
@@ -157,4 +158,9 @@ def delete_folder():
         return jsonify ({"outcome": "True"}),200
 
 if __name__ == "__main__":
+    # 启动后台线程喵～
+    thread = threading.Thread(target=background_task)
+    thread.daemon = True  # 设置为守护线程，主线程结束时自动终止喵～
+    thread.start()
+    
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -3,8 +3,9 @@ from pan123 import Pan123
 import api
 import json
 import os
-
-
+import threading
+import time  # 添加时间模块喵～
+from task.task_start import main_background_task  # 导入后台任务函数喵～
 with open(os.path.join(os.path.dirname(__file__), '..', 'config.json'),
           'r', encoding='utf-8') as f:
     config = json.load(f)
@@ -157,4 +158,14 @@ def delete_folder():
         return jsonify ({"outcome": "True"}),200
 
 if __name__ == "__main__":
+    # 启动后台线程喵～
+    def periodic_task():
+        while True:
+            main_background_task()  # 直接调用main_background_task喵～
+            time.sleep(20)  # 每20秒运行一次喵～
+    
+    thread = threading.Thread(target=periodic_task)
+    thread.daemon = True  # 设置为守护线程，主线程结束时自动终止喵～
+    thread.start()
+    
     app.run(host='0.0.0.0', port=5000, debug=True)

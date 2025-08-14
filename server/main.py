@@ -4,8 +4,8 @@ import api
 import json
 import os
 import threading
-from task.task_start import background_task  # 导入后台任务函数喵～
-
+import time  # 添加时间模块喵～
+from task.task_start import main_background_task  # 导入后台任务函数喵～
 with open(os.path.join(os.path.dirname(__file__), '..', 'config.json'),
           'r', encoding='utf-8') as f:
     config = json.load(f)
@@ -159,7 +159,12 @@ def delete_folder():
 
 if __name__ == "__main__":
     # 启动后台线程喵～
-    thread = threading.Thread(target=background_task)
+    def periodic_task():
+        while True:
+            main_background_task()  # 直接调用main_background_task喵～
+            time.sleep(20)  # 每20秒运行一次喵～
+    
+    thread = threading.Thread(target=periodic_task)
     thread.daemon = True  # 设置为守护线程，主线程结束时自动终止喵～
     thread.start()
     

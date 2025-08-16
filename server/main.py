@@ -161,11 +161,10 @@ if __name__ == "__main__":
     # 启动后台线程喵～
     def periodic_task():
         while True:
-            main_background_task()  # 直接调用main_background_task喵～
-            time.sleep(20)  # 每20秒运行一次喵～
+            main_background_task()  
+            time.sleep(20)  
     
     thread = threading.Thread(target=periodic_task)
-    thread.daemon = True  # 设置为守护线程，主线程结束时自动终止喵～
-    thread.start()
+    thread.daemon = True 
     
     app.run(host='0.0.0.0', port=5000, debug=True)

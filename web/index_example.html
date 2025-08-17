@@ -6,6 +6,7 @@
     <title>FileZen - 智能文件管理系统</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         * {
             margin: 0;
@@ -184,8 +185,13 @@
 
         /* 文件区域 - 列表布局 */
         .file-container.list-layout {
+            display: none;
             padding: 20px;
             animation: fadeIn 0.5s ease;
+        }
+
+        .file-container.list-layout.active {
+            display: block;
         }
 
         .file-list {
@@ -258,6 +264,7 @@
         }
 
         .action-btn:hover {
+            /* 设置面板背景色，使用主色调变量 */
             background: var(--primary);
             color: white;
             transform: scale(1.1);
@@ -282,17 +289,26 @@
         }
 
         @keyframes spread {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 0.1; transform: scale(1); }
-        }
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 0.1; transform: scale(1); }
+}
+
+@keyframes riseUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
 
         /* 文件区域 - 网格布局 */
         .file-container.grid-layout {
+            display: none;
             padding: 20px;
-            display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
             animation: fadeIn 0.5s ease;
+        }
+
+        .file-container.grid-layout.active {
+            display: grid;
         }
 
         .file-card {
@@ -404,21 +420,22 @@
         }
 
         .menu-button {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            z-index: 101;
-        }
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.3s ease, rotate 0.3s ease;
+    border: none;
+    z-index: 101;
+    position: relative;
+}
 
         .menu-button:hover {
             transform: rotate(12deg) scale(1.1);
@@ -426,36 +443,37 @@
         }
 
         .menu-items {
-            display: none;
-            background: var(--primary);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            min-width: 220px;
-            transform: translateY(20px);
-            opacity: 0;
-            animation: menuAppear 0.4s forwards;
-            z-index: 100;
-        }
+    display: none;
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 0;
+    z-index: 100;
+}
 
-        .floating-menu:hover .menu-items {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+.floating-menu:hover .menu-items {
+    display: flex;
+}
 
         .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    text-decoration: none;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(20px);
+    opacity: 0;
+}
 
         .menu-item:hover {
             background: rgba(255, 255, 255, 0.2);
@@ -481,7 +499,7 @@
 
         .menu-item i {
             width: 24px;
-            margin-right: 12px;
+            text-align: center;
             font-size: 1.1rem;
             color: white;
             transition: var(--transition);
@@ -506,10 +524,12 @@
             overflow-y: auto;
         }
 
+        /* 设置面板打开状态 - 从右侧滑入 */
         .settings-panel.open {
             right: 0;
         }
 
+        /* 面板头部区域 - 包含标题和关闭按钮 */
         .panel-header {
             display: flex;
             justify-content: space-between;
@@ -545,6 +565,7 @@
             transform: rotate(90deg);
         }
 
+        /* 设置选项组容器 - 用于对相关设置进行分组 */
         .settings-group {
             margin-bottom: 25px;
             animation: fadeIn 0.5s ease;
@@ -622,7 +643,8 @@
         }
 
         .bg-option.active {
-            border: 2px solid white;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
         }
 
         .bg-option.active::after {
@@ -678,25 +700,11 @@
             background: #f0f0f0;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-        }
-
-        .save-btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: rgba(96, 165, 250, 0.1);
-            transform: rotate(30deg);
-            transition: transform 0.6s ease;
-        }
-
-        .save-btn:hover::after {
-            transform: translateY(100%) rotate(30deg);
+            will-change: transform, box-shadow;
         }
 
         /* 右键菜单 */
+        /* 右键菜单容器 - 绝对定位，默认隐藏 */
         .context-menu {
             position: absolute;
             background: var(--primary);
@@ -770,6 +778,13 @@
             to { opacity: 1; }
         }
 
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
         @keyframes slideDown {
             from { transform: translateY(-20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -780,11 +795,8 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
         
+        /* 通知提示框 - 固定定位在右上角，用于操作反馈 */
         .notification {
             position: fixed;
             top: 20px;
@@ -795,23 +807,10 @@
             border-radius: var(--border-radius);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             z-index: 10000;
-            animation: fadeIn 0.3s, fadeOut 0.3s 2.7s forwards;
+            animation: fadeInOut 3s forwards;
         }
         
         /* 模式切换指示器 */
-        .mode-indicator {
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            background: var(--primary);
-            color: white;
-            font-size: 0.85rem;
-            z-index: 99;
-            animation: slideDown 0.4s;
-            display: none;
-        }
 
         /* 响应式设计 */
         @media (max-width: 768px) {
@@ -854,14 +853,11 @@
             display: grid;
         }
     </style>
+    <!-- 页面主体内容 -->
 </head>
 <body>
-    <!-- 模式切换指示器 -->
-    <div class="mode-indicator" id="modeIndicator">
-        已切换到 <span id="modeText">日间</span> 模式
-    </div>
-    
     <!-- 顶部导航栏 -->
+    <!-- 顶部导航栏 - 包含logo、搜索框和用户操作区 -->
     <header class="header flex items-center justify-between px-6">
         <div class="logo">
             <div class="logo-icon">
@@ -892,6 +888,7 @@
     </header>
 
     <!-- 操作工具栏 -->
+    <!-- 操作工具栏 - 包含文件操作按钮和视图切换 -->
     <div class="toolbar">
         <button class="toolbar-btn" id="uploadBtn">
             <i class="fas fa-upload"></i>
@@ -921,6 +918,7 @@
     </div>
 
     <!-- 文件区域 - 列表布局 -->
+    <!-- 文件区域 - 列表布局视图 -->
     <div class="file-container list-layout active" id="listContainer">
         <div class="file-list" id="fileList">
             <!-- 文件夹项 -->
@@ -1024,6 +1022,7 @@
     </div>
 
     <!-- 文件区域 - 网格布局 -->
+    <!-- 文件区域 - 网格布局视图 -->
     <div class="file-container grid-layout" id="gridContainer">
         <!-- 文件夹卡片 -->
         <div class="file-card">
@@ -1155,35 +1154,63 @@
     </div>
 
     <!-- 右下角浮动菜单 -->
+    <!-- 右下角浮动菜单 - 提供快捷操作入口 -->
     <div class="floating-menu">
         <button class="menu-button" id="floatingMenuBtn">
             <i class="fas fa-plus"></i>
         </button>
         <div class="menu-items">
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" title="上传文件">
                 <i class="fas fa-cloud-upload-alt"></i>
-                <span>上传文件</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" title="刷新列表">
                 <i class="fas fa-sync-alt"></i>
-                <span>刷新列表</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" title="排序方式">
                 <i class="fas fa-sort-amount-down"></i>
-                <span>排序方式</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" title="文件过滤">
                 <i class="fas fa-filter"></i>
-                <span>文件过滤</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" title="系统信息">
                 <i class="fas fa-info-circle"></i>
-                <span>系统信息</span>
             </a>
         </div>
     </div>
 
+    <style>
+        /* 工具提示样式 */
+        .menu-item[title] {
+            position: relative;
+        }
+
+        .menu-item[title]::after {
+            content: attr(title);
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-right: 10px;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            pointer-events: none;
+        }
+
+        .menu-item[title]:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+
     <!-- 设置面板 -->
+    <!-- 设置面板 - 包含主题、布局和图标等系统设置 -->
     <div class="settings-panel" id="settingsPanel">
         <div class="panel-header">
             <h2 class="panel-title">系统设置</h2>
@@ -1271,6 +1298,7 @@
     </div>
     
     <!-- 右键上下文菜单 -->
+    <!-- 右键上下文菜单 - 包含文件操作选项 -->
     <div class="context-menu" id="contextMenu">
         <div class="context-menu-item" data-action="open">
             <i class="fas fa-folder-open"></i>
@@ -1307,12 +1335,14 @@
     </div>
     
     <!-- 状态信息栏 -->
+    <!-- 状态信息栏 - 显示文件统计和操作提示 -->
     <div class="status-bar">
         <span>文件总数: <span id="fileCount">6</span> | 已选: <span id="selectedCount">0</span></span>
         <span class="status-selection">按 Ctrl 键可多选 | Delete 删除 | Ctrl+A 全选</span>
     </div>
 
     <script>
+        /* DOM元素获取 - 获取页面中所有需要交互的元素 */
         // DOM 元素
         const settingsButton = document.getElementById('settingsButton');
         const closeSettings = document.getElementById('closeSettings');
@@ -1339,21 +1369,14 @@
         const modeIndicator = document.getElementById('modeIndicator');
         const modeText = document.getElementById('modeText');
         
+        /* 全局状态变量 */
         // 当前选中的文件项
         let selectedFileItem = null;
         let currentLayout = 'list';
-        let isCtrlPressed = false;
         let selectedFiles = new Set();
         
-        // 初始化主题
-        function initTheme() {
-            const isNightMode = localStorage.getItem('nightMode') === 'true';
-            document.body.classList.toggle('night-mode', isNightMode);
-            themeIcon.classList.toggle('fa-moon', !isNightMode);
-            themeIcon.classList.toggle('fa-sun', isNightMode);
-        }
-        
-        // 切换主题
+        /* 主题相关函数 */
+        // 切换主题 - 切换日间/夜间模式
         function toggleTheme() {
             const isNightMode = document.body.classList.toggle('night-mode');
             localStorage.setItem('nightMode', isNightMode);
@@ -1362,14 +1385,9 @@
             themeIcon.classList.toggle('fa-moon', !isNightMode);
             themeIcon.classList.toggle('fa-sun', isNightMode);
             
-            // 显示模式切换提示
-            modeText.textContent = isNightMode ? '夜间' : '日间';
-            modeIndicator.style.display = 'block';
-            setTimeout(() => {
-                modeIndicator.style.display = 'none';
-            }, 2000);
         }
         
+        /* 设置面板相关事件 */
         // 打开设置面板
         settingsButton.addEventListener('click', () => {
             settingsPanel.classList.add('open');
@@ -1380,7 +1398,7 @@
             settingsPanel.classList.remove('open');
         });
         
-        // 主题颜色更改
+        // 主题颜色更改 - 更新主色调并预览
         themeColor.addEventListener('input', () => {
             const color = themeColor.value;
             colorPreview.style.background = color;
@@ -1395,17 +1413,22 @@
             document.body.style.backgroundColor = color;
         });
         
-        // 布局切换
+        /* 布局切换相关函数 */
+        // 布局切换 - 在列表和网格布局间切换
         function switchLayout(layout) {
             currentLayout = layout;
+            // 获取布局容器
+            const listContainer = document.querySelector('.file-container.list-layout');
+            const gridContainer = document.querySelector('.file-container.grid-layout');
+            
             // 更新按钮状态
             listViewBtn.classList.remove('active');
             gridViewBtn.classList.remove('active');
-            
+
             // 隐藏所有布局
             listContainer.classList.remove('active');
             gridContainer.classList.remove('active');
-            
+
             if (layout === 'list') {
                 listViewBtn.classList.add('active');
                 listContainer.classList.add('active');
@@ -1423,7 +1446,8 @@
             switchLayout('grid');
         });
         
-        // 文件项点击效果
+        /* 文件选择相关函数 */
+        // 文件项点击效果 - 处理文件选中状态切换
         function toggleFileSelection(fileItem, isCtrlKey) {
             if (!isCtrlKey) {
                 // 清除所有选中
@@ -1446,6 +1470,7 @@
             updateSelectionCount();
         }
         
+        // 更新选中计数 - 同步更新状态栏中的选中文件数量
         function updateSelectionCount() {
             selectedCount.textContent = selectedFiles.size;
             
@@ -1487,7 +1512,8 @@
             }
         });
         
-        // 键盘事件
+        /* 键盘事件处理 */
+        // 键盘事件 - 处理Delete删除和Ctrl+A全选
         document.addEventListener('keydown', function(e) {
             // 记录Ctrl键状态
             if (e.key === 'Control' || e.key === 'Meta') {
@@ -1498,12 +1524,13 @@
             if (e.key === 'Delete' && selectedFiles.size > 0) {
                 const confirmed = confirm(`确定要删除 ${selectedFiles.size} 个文件吗？`);
                 if (confirmed) {
+                    const deletedCount = selectedFiles.size;
                     selectedFiles.forEach(item => {
                         item.remove();
                     });
                     selectedFiles.clear();
                     updateSelectionCount();
-                    showNotification(`${selectedFiles.size}个文件已删除`);
+                    showNotification(`${deletedCount}个文件已删除`);
                 }
             }
             
@@ -1524,13 +1551,8 @@
             }
         });
         
-        document.addEventListener('keyup', function(e) {
-            if (e.key === 'Control' || e.key === 'Meta') {
-                isCtrlPressed = false;
-            }
-        });
-        
-        // 删除按钮事件
+        /* 工具栏按钮事件 */
+        // 删除按钮事件 - 删除选中的文件
         deleteBtn.addEventListener('click', function() {
             if (selectedFiles.size === 0) return;
             
@@ -1545,7 +1567,7 @@
             }
         });
         
-        // 上传按钮事件
+        // 上传按钮事件 - 触发文件上传功能
         uploadBtn.addEventListener('click', function() {
             showNotification('上传功能已触发');
         });
@@ -1561,104 +1583,78 @@
             showNotification(`已分享 ${selectedFiles.size} 个文件`);
         });
         
-        // 搜索功能
+        /* 搜索功能实现 */
+        // 搜索功能 - 根据输入内容筛选文件
+        // 缓存搜索相关DOM元素
+        const listItems = document.querySelectorAll('.file-item');
+        const gridItems = document.querySelectorAll('.file-card');
+        const fileNames = Array.from(listItems).map(item => item.querySelector('.file-name').textContent.toLowerCase());
+        const cardNames = Array.from(gridItems).map(item => item.querySelector('.card-name').textContent.toLowerCase());
+
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             
             // 列表布局搜索
-            const listItems = document.querySelectorAll('.file-item');
-            listItems.forEach(item => {
-                const fileName = item.querySelector('.file-name').textContent.toLowerCase();
-                item.style.display = fileName.includes(searchTerm) ? 'grid' : 'none';
+            listItems.forEach((item, index) => {
+                item.style.display = fileNames[index].includes(searchTerm) ? 'grid' : 'none';
             });
             
             // 网格布局搜索
-            const gridItems = document.querySelectorAll('.file-card');
-            gridItems.forEach(item => {
-                const fileName = item.querySelector('.card-name').textContent.toLowerCase();
-                item.style.display = fileName.includes(searchTerm) ? 'block' : 'none';
+            gridItems.forEach((item, index) => {
+                item.style.display = cardNames[index].includes(searchTerm) ? 'block' : 'none';
             });
         });
         
-        // 背景选项点击
-        document.querySelectorAll('.bg-option').forEach(option => {
-            option.addEventListener('click', function() {
-                if (!this.dataset.bg) return;
-                
-                // 移除所有active类
-                document.querySelectorAll('.bg-option').forEach(opt => {
-                    opt.classList.remove('active');
-                });
-                
-                // 添加active类到当前选项
-                this.classList.add('active');
-                
-                const bgType = this.getAttribute('data-bg');
-                let bgStyle = '';
-                
-                switch(bgType) {
-                    case 'light-gray':
-                        bgStyle = '#f5f7ff';
-                        break;
-                    case 'light-blue':
-                        bgStyle = '#e0f2ff';
-                        break;
-                    case 'light-green':
-                        bgStyle = '#e0ffe0';
-                        break;
-                    case 'light-yellow':
-                        bgStyle = '#fff9e0';
-                        break;
-                    case 'light-pink':
-                        bgStyle = '#ffe0f7';
-                        break;
-                    case 'light-purple':
-                        bgStyle = '#f0e0ff';
-                        break;
-                    case 'gradient-purple':
-                        bgStyle = 'linear-gradient(135deg, #5a5a5a, #3a3a3a)';
-                        break;
-                    case 'gradient-blue':
-                        bgStyle = 'linear-gradient(135deg, #696969, #4a4a4a)';
-                        break;
-                    case 'gradient-orange':
-                        bgStyle = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
-                        break;
-                    case 'gradient-green':
-                        bgStyle = 'linear-gradient(135deg, #a1c4fd, #c2e9fb)';
-                        break;
-                    case 'gradient-purple-blue':
-                        bgStyle = 'linear-gradient(135deg, #667eea, #764ba2)';
-                        break;
-                    case 'gradient-sunset':
-                        bgStyle = 'linear-gradient(135deg, #f6d365, #fda085)';
-                        break;
-                    case 'gradient-purple-blue-2':
-                        bgStyle = 'linear-gradient(135deg, #6a11cb, #2575fc)';
-                        break;
-                    case 'gradient-green-2':
-                        bgStyle = 'linear-gradient(135deg, #d4fc79, #96e6a1)';
-                        break;
-                    case 'gradient-pink-red':
-                        bgStyle = 'linear-gradient(135deg, #f093fb, #f5576c)';
-                        break;
-                    case 'gradient-blue-purple':
-                        bgStyle = 'linear-gradient(135deg, #5ee7df, #b490ca)';
-                        break;
-                    default:
-                        bgStyle = '#f5f7ff';
-                }
-                
-                document.body.style.background = bgStyle;
-                showNotification(`背景已更换为 ${bgType.replace(/-/g, ' ')}`);
+        /* 背景设置相关 */
+        // 背景选项点击 - 切换不同背景样式
+        // 使用事件委托处理背景选项点击
+        document.querySelector('.bg-options').addEventListener('click', function(e) {
+            const option = e.target.closest('.bg-option');
+            if (!option || !option.dataset.bg) return;
+            
+            // 移除所有active类
+            document.querySelectorAll('.bg-option').forEach(opt => {
+                opt.classList.remove('active');
             });
+            
+            // 添加active类到当前选项
+            option.classList.add('active');
+            
+            const bgType = option.getAttribute('data-bg');
+            let bgStyle = '';
+            
+            // 使用对象字面量替代switch语句提高性能
+            const bgStyles = {
+                'light-gray': '#f5f7ff',
+                'light-blue': '#e0f2ff',
+                'light-green': '#e0ffe0',
+                'light-yellow': '#fff9e0',
+                'light-pink': '#ffe0f7',
+                'light-purple': '#f0e0ff',
+                'gradient-purple': 'linear-gradient(135deg, #5a5a5a, #3a3a3a)',
+                'gradient-blue': 'linear-gradient(135deg, #696969, #4a4a4a)',
+                'gradient-orange': 'linear-gradient(135deg, #ff9a9e, #fad0c4)',
+                'gradient-green': 'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
+                'gradient-purple-blue': 'linear-gradient(135deg, #667eea, #764ba2)',
+                'gradient-sunset': 'linear-gradient(135deg, #f6d365, #fda085)',
+                'gradient-purple-blue-2': 'linear-gradient(135deg, #6a11cb, #2575fc)',
+                'gradient-green-2': 'linear-gradient(135deg, #d4fc79, #96e6a1)',
+                'gradient-pink-red': 'linear-gradient(135deg, #f093fb, #f5576c)',
+                'gradient-blue-purple': 'linear-gradient(135deg, #5ee7df, #b490ca)'
+            };
+            
+            bgStyle = bgStyles[bgType] || '#f5f7ff';
+            document.body.style.background = bgStyle;
+            const formattedBgName = bgType.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            showNotification(`背景已更换为 ${formattedBgName}`);
         });
         
-        // 右键菜单功能实现
+        /* 右键菜单功能 */
+        // 右键菜单功能实现 - 在文件项上显示上下文菜单
         document.addEventListener('contextmenu', function(e) {
             // 检查是否点击在文件项上
             const fileItem = e.target.closest('.file-item, .file-card');
-            if (fileItem) {
+            if (fileItem && (e.target.closest('.file-item') || e.target.closest('.file-card'))) {
                 e.preventDefault();
                 selectedFileItem = fileItem;
                 
@@ -1670,24 +1666,26 @@
         });
         
         // 菜单项点击事件
-        contextMenu.querySelectorAll('.context-menu-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const action = this.getAttribute('data-action');
-                let fileName = '';
-                
-                if (selectedFileItem) {
-                    if (selectedFileItem.classList.contains('file-item')) {
-                        fileName = selectedFileItem.querySelector('.file-name').textContent;
-                    } else {
-                        fileName = selectedFileItem.querySelector('.card-name').textContent;
-                    }
-                    
-                    showNotification(`对文件 "${fileName}" 执行了操作: ${action}`);
+        // 使用事件委托处理上下文菜单项点击
+        contextMenu.addEventListener('click', function(e) {
+            const menuItem = e.target.closest('.context-menu-item');
+            if (!menuItem) return;
+            
+            const action = menuItem.getAttribute('data-action');
+            let fileName = '';
+            
+            if (selectedFileItem) {
+                if (selectedFileItem.classList.contains('file-item')) {
+                    fileName = selectedFileItem.querySelector('.file-name').textContent;
+                } else {
+                    fileName = selectedFileItem.querySelector('.card-name').textContent;
                 }
                 
-                // 隐藏菜单
-                contextMenu.style.display = 'none';
-            });
+                showNotification(`对文件 "${fileName}" 执行了操作: ${action}`);
+            }
+            
+            // 隐藏菜单
+            contextMenu.style.display = 'none';
         });
         
         // 点击其他地方隐藏菜单
@@ -1697,22 +1695,33 @@
             }
         });
         
-        // 显示通知
+        /* 通知提示功能 */
+        // 显示通知 - 在右上角显示操作结果提示
+        // 创建单个通知元素并复用
+        let notificationElement;
         function showNotification(message) {
-            const existing = document.querySelector('.notification');
-            if (existing) existing.remove();
+            if (!notificationElement) {
+                notificationElement = document.createElement('div');
+                notificationElement.className = 'notification';
+                document.body.appendChild(notificationElement);
+            }
             
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${message}`;
-            document.body.appendChild(notification);
+            notificationElement.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${message}`;
+            notificationElement.style.display = 'flex';
             
-            setTimeout(() => {
-                notification.remove();
+            // 清除之前的定时器
+            if (notificationElement.timeoutId) {
+                clearTimeout(notificationElement.timeoutId);
+            }
+            
+            // 设置新的定时器
+            notificationElement.timeoutId = setTimeout(() => {
+                notificationElement.style.display = 'none';
             }, 3000);
         }
         
         // 初始化
+        // DOM加载完成后执行初始化
         document.addEventListener('DOMContentLoaded', () => {
             colorPreview.style.background = themeColor.value;
             listLayoutBtn.classList.add('active');
@@ -1720,12 +1729,31 @@
             // 确保初始只显示列表布局
             switchLayout('list');
             
-            // 初始化主题
-            initTheme();
+            // 浮动菜单交互逻辑 - 恢复为悬停触发
+            // 为每个菜单项添加不同的动画延迟
+            const menuItemElements = document.querySelectorAll('.menu-item');
+            menuItemElements.forEach((item, index) => {
+                item.style.animation = `riseUp 0.3s ease ${index * 0.1}s forwards`;
+            });
         });
         
-        // 添加主题切换事件
+        /* 设置面板中的布局切换 */
+        // 设置面板布局切换 - 从设置面板切换文件布局
+        document.getElementById('listLayout').addEventListener('click', () => {
+            switchLayout('list');
+            listLayoutBtn.classList.add('active');
+            gridLayoutBtn.classList.remove('active');
+        });
+        
+        document.getElementById('gridLayout').addEventListener('click', () => {
+            switchLayout('grid');
+            gridLayoutBtn.classList.add('active');
+            listLayoutBtn.classList.remove('active');
+        });
+        
+        // 添加主题切换事件 - 绑定主题切换按钮事件
         themeToggle.addEventListener('click', toggleTheme);
     </script>
+    
 </body>
 </html>

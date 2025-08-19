@@ -157,6 +157,10 @@ def delete_folder():
     else :
         return jsonify ({"outcome": "True"}),200
 
+@app.route("/api/config", methods=['GET'])
+def get_config():
+    return jsonify(config)
+
 if __name__ == "__main__":
     # 启动后台线程喵～
     def periodic_task():

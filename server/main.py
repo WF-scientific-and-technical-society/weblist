@@ -186,7 +186,7 @@ def list_files():
                 "name": folder["name"],
                 "size": 0,  # 文件夹大小为0
                 "type": "folder",
-                "upload_time": "2025-08-19T10:30:00Z",  # 默认时间
+                "upload_time": folder.get("upload_time", time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),  # 使用元数据或当前时间
                 "download_url": f"/api/files/{folder['id']}/download"
             }
             all_items.append(item)
@@ -214,7 +214,7 @@ def list_files():
                 "name": file["name"],
                 "size": size_bytes,
                 "type": file_extension,
-                "upload_time": "2025-08-19T10:30:00Z",  # 默认时间
+                "upload_time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),  # 当前时间
                 "download_url": f"/api/files/{file['id']}/download"
             }
             all_items.append(item)

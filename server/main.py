@@ -157,6 +157,105 @@ def delete_folder():
     else :
         return jsonify ({"outcome": "True"}),200
 
+@app.route("/api/list", methods=['GET'])
+def list_files():
+    # 获取查询参数
+    page = request.args.get('page', default=1, type=int)
+    page_size = request.args.get('page_size', default=20, type=int)
+    keyword = request.args.get('keyword', default='', type=str)
+    file_type = request.args.get('file_type', default='', type=str)
+    
+    # 调用API获取文件列表
+    try:
+        # 获取当前目录下的所有文件和文件夹
+        result = api.list()
+        if "error" in result:
+            return jsonify({
+                "code": 500,
+                "message": result["error"],
+                "data": {}
+            }), 500
+        
+        # 合并文件和文件夹列表
+        all_items = []
+        
+        # 处理文件夹
+        for folder in result["folder"]:
+            item = {
+                "file_id": folder["id"],
+                "name": folder["name"],
+                "size": 0,  # 文件夹大小为0
+                "type": "folder",
+                "upload_time": "2025-08-19T10:30:00Z",  # 默认时间
+                "download_url": f"/api/files/{folder['id']}/download"
+            }
+            all_items.append(item)
+        
+        # 处理文件
+        for file in result["file"]:
+            # 从文件名中提取文件类型
+            file_parts = file["name"].split(".")
+            file_extension = file_parts[-1].lower() if len(file_parts) > 1 else ""
+            
+            # 将size_str转换为字节数（简化处理）
+            size_str = file["size"]
+            size_bytes = 0
+            if size_str.endswith("GB"):
+                size_bytes = int(float(size_str[:-2]) * 1024 * 1024 * 1024)
+            elif size_str.endswith("MB"):
+                size_bytes = int(float(size_str[:-2]) * 1024 * 1024)
+            elif size_str.endswith("KB"):
+                size_bytes = int(float(size_str[:-2]) * 1024)
+            else:
+                size_bytes = int(size_str[:-1]) if size_str.endswith("B") else 0
+            
+            item = {
+                "file_id": file["id"],
+                "name": file["name"],
+                "size": size_bytes,
+                "type": file_extension,
+                "upload_time": "2025-08-19T10:30:00Z",  # 默认时间
+                "download_url": f"/api/files/{file['id']}/download"
+            }
+            all_items.append(item)
+        
+        # 根据keyword过滤
+        if keyword:
+            all_items = [item for item in all_items if keyword.lower() in item["name"].lower()]
+        
+        # 根据file_type过滤
+        if file_type:
+            if file_type.lower() == "folder":
+                all_items = [item for item in all_items if item["type"] == "folder"]
+            else:
+                all_items = [item for item in all_items if item["type"] == file_type.lower()]
+        
+        # 计算总数
+        total = len(all_items)
+        
+        # 分页处理
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        paginated_items = all_items[start_index:end_index]
+        
+        # 返回结果
+        return jsonify({
+            "code": 200,
+            "message": "success",
+            "data": {
+                "total": total,
+                "page": page,
+                "page_size": page_size,
+                "files": paginated_items
+            }
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "code": 500,
+            "message": str(e),
+            "data": {}
+        }), 500
+
 if __name__ == "__main__":
     # 启动后台线程喵～
     def periodic_task():

@@ -6,6 +6,7 @@ import os
 import threading
 import time  # 添加时间模块喵～
 from task.task_start import main_background_task  # 导入后台任务函数喵～
+import bcrypt  # 密码加密库喵～
 with open(os.path.join(os.path.dirname(__file__), '..', 'config.json'),
           'r', encoding='utf-8') as f:
     config = json.load(f)
@@ -255,6 +256,43 @@ def list_files():
             "message": str(e),
             "data": {}
         }), 500
+
+@app.route("/api/auth/password", methods=['PUT'])
+def change_password():
+    # 检查用户是否已登录
+    if 'username' not in session:
+        return jsonify({"code": 401, "message": "未登录"}), 401
+    
+    # 获取JSON数据
+    data = request.json
+    if not data or 'old_password' not in data or 'new_password' not in data:
+        return jsonify({"code": 400, "message": "缺少必要参数"}), 400
+    
+    old_password = data['old_password']
+    new_password = data['new_password']
+    
+    try:
+        # 读取用户账户文件
+        with open('User-account-password.json', 'r', encoding='utf-8') as f:
+            user_data = json.load(f)
+        
+        # 验证旧密码是否正确
+        if user_data.get('password') != old_password:
+            return jsonify({"code": 400, "message": "旧密码错误"}), 400
+        
+        # 使用bcrypt加密新密码
+        hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        # 保存新密码到文件
+        user_data['password'] = hashed_password
+        with open('User-account-password.json', 'w', encoding='utf-8') as f:
+            json.dump(user_data, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({"code": 200, "message": "密码修改成功"}), 200
+    except FileNotFoundError:
+        return jsonify({"code": 500, "message": "用户账户文件不存在"}), 500
+    except Exception as e:
+        return jsonify({"code": 500, "message": str(e)}), 500
 
 if __name__ == "__main__":
     # 启动后台线程喵～

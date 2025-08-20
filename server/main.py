@@ -158,6 +158,10 @@ def delete_folder():
     else :
         return jsonify ({"outcome": "True"}),200
 
+@app.route("/api/config", methods=['GET'])
+def get_config():
+    return jsonify(config)
+
 @app.route("/api/list", methods=['GET'])
 def list_files():
     # 获取查询参数

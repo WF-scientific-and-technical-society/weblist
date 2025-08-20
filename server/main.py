@@ -298,6 +298,45 @@ def change_password():
     except Exception as e:
         return jsonify({"code": 500, "message": str(e)}), 500
 
+@app.route("/api/config", methods=['PUT'])
+def update_config():
+    # 获取请求体中的JSON数据
+    data = request.json
+    if not data:
+        return jsonify({"code": 400, "message": "请求体不能为空"}), 400
+    
+    # 读取当前配置
+    config_path = os.path.join(os.path.dirname(__file__), '..', 'config.json')
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+    
+    # 更新site配置
+    if 'site' in data:
+        site_data = data['site']
+        if 'title' in site_data:
+            config['site']['title'] = site_data['title']
+        if 'description' in site_data:
+            config['site']['description'] = site_data['description']
+    
+    # 更新theme配置
+    if 'theme' in data:
+        theme_data = data['theme']
+        if 'primary_color' in theme_data:
+            config['theme']['primary_color'] = theme_data['primary_color']
+    
+    # 保存更新后的配置
+    with open(config_path, 'w', encoding='utf-8') as f:
+        json.dump(config, f, ensure_ascii=False, indent=2)
+    
+    # 返回成功响应，固定返回指定的字段列表
+    return jsonify({
+        "code": 200,
+        "message": "配置更新成功",
+        "data": {
+            "updated_fields": ["site.title", "site.description", "theme.primary_color"]
+        }
+    }), 200
+
 if __name__ == "__main__":
     # 启动后台线程喵～
     def periodic_task():

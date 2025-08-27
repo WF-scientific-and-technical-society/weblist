@@ -1,0 +1,2 @@
+- `index_example.html` 是单独的一份前端文件，与 `static` 目录内的代码无关。
+- `templates` 目录里的 HTML 文件才是对应 `static` 目录的文件。

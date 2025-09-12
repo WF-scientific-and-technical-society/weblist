@@ -1374,8 +1374,32 @@
         let selectedFileItem = null;
         let currentLayout = 'list';
         let selectedFiles = new Set();
+        let isCtrlPressed = false; // 声明Ctrl键状态变量
         
         /* 主题相关函数 */
+        // 初始化主题系统
+        function initThemeSystem() {
+            // 定义默认背景色
+            document.documentElement.style.setProperty('--day-bg', '#ffffff');
+            document.documentElement.style.setProperty('--night-bg', '#1a1a1a');
+            document.documentElement.style.setProperty('--day-bg-gradient', '#f5f7ff');
+            document.documentElement.style.setProperty('--night-bg-gradient', 'linear-gradient(135deg, #2d2d2d, #1a1a1a)');
+        }
+
+        // 应用保存的背景设置
+        function applySavedBackground() {
+            const isNightMode = document.body.classList.contains('night-mode');
+            const bgKey = isNightMode ? 'night-bg-gradient' : 'day-bg-gradient';
+            const savedBg = localStorage.getItem(bgKey);
+            
+            if (savedBg) {
+                document.documentElement.style.setProperty('--' + bgKey, savedBg);
+            }
+            
+            // 使用CSS变量设置背景，而不是直接设置body.style.background
+            document.body.style.background = 'var(--' + bgKey + ')';
+        }
+
         // 切换主题 - 切换日间/夜间模式
         function toggleTheme() {
             const isNightMode = document.body.classList.toggle('night-mode');
@@ -1384,7 +1408,9 @@
             // 更新图标
             themeIcon.classList.toggle('fa-moon', !isNightMode);
             themeIcon.classList.toggle('fa-sun', isNightMode);
-            
+
+            // 应用保存的背景设置
+            applySavedBackground();
         }
         
         /* 设置面板相关事件 */
@@ -1404,13 +1430,70 @@
             colorPreview.style.background = color;
             document.documentElement.style.setProperty('--primary', color);
             
-            // 更新主色调的深色变体
+            // 更新主色调的深色变体 - 使用更严谨的算法确保RGB分量不为负
+            // 将HEX转换为RGB
             const r = parseInt(color.substr(1, 2), 16);
             const g = parseInt(color.substr(3, 2), 16);
             const b = parseInt(color.substr(5, 2), 16);
-            const darkColor = `rgb(${Math.max(0, r - 40)}, ${Math.max(0, g - 40)}, ${Math.max(0, b - 40)})`;
+
+            // 使用HSL颜色空间生成深色变体
+            // 1. 转换RGB到HSL
+            const rNorm = r / 255;
+            const gNorm = g / 255;
+            const bNorm = b / 255;
+
+            const max = Math.max(rNorm, gNorm, bNorm);
+            const min = Math.min(rNorm, gNorm, bNorm);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0; // 灰度
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+                switch (max) {
+                    case rNorm: h = (gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0); break;
+                    case gNorm: h = (bNorm - rNorm) / d + 2; break;
+                    case bNorm: h = (rNorm - gNorm) / d + 4; break;
+                }
+
+                h /= 6;
+            }
+
+            // 降低亮度生成深色变体 (减少25%)
+            l = Math.max(0, l - 0.25);
+
+            // 2. 将HSL转换回RGB
+            let rNew, gNew, bNew;
+
+            if (s === 0) {
+                rNew = gNew = bNew = l; // 灰度
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                rNew = hue2rgb(p, q, h + 1/3);
+                gNew = hue2rgb(p, q, h);
+                bNew = hue2rgb(p, q, h - 1/3);
+            }
+
+            // 转换为RGB值并确保在0-255范围内
+            const rDark = Math.round(rNew * 255);
+            const gDark = Math.round(gNew * 255);
+            const bDark = Math.round(bNew * 255);
+
+            // 设置CSS变量
+            const darkColor = `rgb(${rDark}, ${gDark}, ${bDark})`;
             document.documentElement.style.setProperty('--primary-dark', darkColor);
-            document.body.style.backgroundColor = color;
         });
         
         /* 布局切换相关函数 */
@@ -1515,11 +1598,25 @@
         /* 键盘事件处理 */
         // 键盘事件 - 处理Delete删除和Ctrl+A全选
         document.addEventListener('keydown', function(e) {
+            // 检查当前活动元素是否为输入元素
+            const activeElement = document.activeElement;
+            const isInputElement = activeElement && (
+                activeElement.tagName === 'INPUT' ||
+                activeElement.tagName === 'TEXTAREA' ||
+                activeElement.isContentEditable
+            );
+
             // 记录Ctrl键状态
             if (e.key === 'Control' || e.key === 'Meta') {
                 isCtrlPressed = true;
             }
-            
+
+            // 如果焦点在输入元素上，只处理与输入无关的键
+            if (isInputElement) {
+                // 只处理Ctrl键状态记录，不处理其他功能键
+                return;
+            }
+
             // Delete键删除选中项
             if (e.key === 'Delete' && selectedFiles.size > 0) {
                 const confirmed = confirm(`确定要删除 ${selectedFiles.size} 个文件吗？`);
@@ -1533,21 +1630,28 @@
                     showNotification(`${deletedCount}个文件已删除`);
                 }
             }
-            
+
             // Ctrl+A全选
             if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
                 e.preventDefault();
-                
+
                 const items = currentLayout === 'list' 
                     ? document.querySelectorAll('.file-item') 
                     : document.querySelectorAll('.file-card');
-                
+
                 items.forEach(item => {
                     item.classList.add('selected');
                     selectedFiles.add(item);
                 });
-                
+
                 updateSelectionCount();
+            }
+        });
+
+        // 键盘抬起事件 - 重置Ctrl键状态
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'Control' || e.key === 'Meta') {
+                isCtrlPressed = false;
             }
         });
         
@@ -1644,7 +1748,16 @@
             };
             
             bgStyle = bgStyles[bgType] || '#f5f7ff';
-            document.body.style.background = bgStyle;
+            // 根据当前模式保存背景样式
+            const isNightMode = document.body.classList.contains('night-mode');
+            const bgKey = isNightMode ? 'night-bg-gradient' : 'day-bg-gradient';
+            document.documentElement.style.setProperty('--' + bgKey, bgStyle);
+            
+            // 使用CSS变量设置背景，而不是直接设置body.style.background
+            document.body.style.background = 'var(--' + bgKey + ')';
+            
+            // 保存到localStorage
+            localStorage.setItem(bgKey, bgStyle);
             const formattedBgName = bgType.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             showNotification(`背景已更换为 ${formattedBgName}`);
         });
@@ -1660,8 +1773,27 @@
                 
                 // 显示菜单
                 contextMenu.style.display = 'block';
-                contextMenu.style.left = `${e.pageX}px`;
-                contextMenu.style.top = `${e.pageY}px`;
+                
+                // 计算菜单位置，防止溢出屏幕
+                const menuWidth = contextMenu.offsetWidth;
+                const menuHeight = contextMenu.offsetHeight;
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                
+                // 水平位置调整
+                let left = e.pageX;
+                if (left + menuWidth > windowWidth) {
+                    left = windowWidth - menuWidth - 10;
+                }
+                
+                // 垂直位置调整
+                let top = e.pageY;
+                if (top + menuHeight > windowHeight) {
+                    top = windowHeight - menuHeight - 10;
+                }
+                
+                contextMenu.style.left = `${left}px`;
+                contextMenu.style.top = `${top}px`;
             }
         });
         
@@ -1697,9 +1829,30 @@
         
         /* 通知提示功能 */
         // 显示通知 - 在右上角显示操作结果提示
-        // 创建单个通知元素并复用
+        // 使用通知队列管理多个通知
+        const notificationQueue = [];
         let notificationElement;
+        let isNotificationShowing = false;
+        
         function showNotification(message) {
+            // 添加到队列
+            notificationQueue.push(message);
+            
+            // 如果当前没有通知显示，则显示下一个
+            if (!isNotificationShowing) {
+                showNextNotification();
+            }
+        }
+        
+        function showNextNotification() {
+            if (notificationQueue.length === 0) {
+                isNotificationShowing = false;
+                return;
+            }
+            
+            isNotificationShowing = true;
+            const message = notificationQueue.shift();
+            
             if (!notificationElement) {
                 notificationElement = document.createElement('div');
                 notificationElement.className = 'notification';
@@ -1709,25 +1862,54 @@
             notificationElement.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${message}`;
             notificationElement.style.display = 'flex';
             
-            // 清除之前的定时器
-            if (notificationElement.timeoutId) {
-                clearTimeout(notificationElement.timeoutId);
-            }
-            
-            // 设置新的定时器
+            // 设置定时器隐藏通知
             notificationElement.timeoutId = setTimeout(() => {
                 notificationElement.style.display = 'none';
+                // 延迟一段时间后显示下一个通知
+                setTimeout(showNextNotification, 500);
             }, 3000);
         }
         
         // 初始化
         // DOM加载完成后执行初始化
+        // 应用保存的背景设置
+        function applySavedBackground() {
+            const isNightMode = document.body.classList.contains('night-mode');
+            const bgKey = isNightMode ? 'night-bg-gradient' : 'day-bg-gradient';
+            const savedBg = localStorage.getItem(bgKey);
+            
+            if (savedBg) {
+                document.documentElement.style.setProperty('--' + bgKey, savedBg);
+                document.body.style.background = 'var(--' + bgKey + ')';
+            } else {
+                // 使用默认背景
+                document.body.style.background = 'var(--' + bgKey + ')';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             colorPreview.style.background = themeColor.value;
             listLayoutBtn.classList.add('active');
             
+            // 初始化主题系统
+            initThemeSystem();
+            
+            // 检查是否有保存的夜间模式状态
+            const savedNightMode = localStorage.getItem('nightMode') === 'true';
+            if (savedNightMode) {
+                document.body.classList.add('night-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            // 应用保存的背景设置
+            applySavedBackground();
+            
             // 确保初始只显示列表布局
             switchLayout('list');
+            
+            // 加载保存的文件选择状态
+            loadSelectedFiles();
             
             // 浮动菜单交互逻辑 - 恢复为悬停触发
             // 为每个菜单项添加不同的动画延迟
@@ -1736,6 +1918,40 @@
                 item.style.animation = `riseUp 0.3s ease ${index * 0.1}s forwards`;
             });
         });
+
+        // 监听页面卸载事件，保存文件选择状态
+        window.addEventListener('beforeunload', () => {
+            if (selectedFiles.size > 0) {
+                // 获取选中文件的id或其他唯一标识符
+                const selectedIds = Array.from(selectedFiles).map(item => {
+                    return item.dataset.id || item.id;
+                });
+                localStorage.setItem('selectedFiles', JSON.stringify(selectedIds));
+            } else {
+                localStorage.removeItem('selectedFiles');
+            }
+        });
+
+        // 加载保存的文件选择状态
+        function loadSelectedFiles() {
+            const savedSelected = localStorage.getItem('selectedFiles');
+            if (savedSelected) {
+                try {
+                    const selectedIds = JSON.parse(savedSelected);
+                    selectedIds.forEach(id => {
+                        const fileItem = document.querySelector(`[data-id="${id}"]`) || document.getElementById(id);
+                        if (fileItem) {
+                            fileItem.classList.add('selected');
+                            selectedFiles.add(fileItem);
+                        }
+                    });
+                    updateSelectionCount();
+                } catch (e) {
+                    console.error('Failed to load selected files:', e);
+                    localStorage.removeItem('selectedFiles');
+                }
+            }
+        }
         
         /* 设置面板中的布局切换 */
         // 设置面板布局切换 - 从设置面板切换文件布局

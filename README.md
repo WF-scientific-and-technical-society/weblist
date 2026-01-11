@@ -1,3 +1,6 @@
+> [!CAUTION]
+> 由于123网盘的API改了，所以此仓库被弃用
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=WF-scientific-and-technical-society/weblist&type=date&legend=top-left)](https://www.star-history.com/#WF-scientific-and-technical-society/weblist&type=date&legend=top-left)

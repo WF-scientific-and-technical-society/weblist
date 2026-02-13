@@ -1,0 +1,191 @@
+@media (max-width: 1200px) {
+    .main-layout {
+        padding: 16px;
+    }
+    
+    .sidebar {
+        width: 180px;
+    }
+}
+
+@media (max-width: 992px) {
+    .menu-toggle {
+        display: block;
+    }
+    
+    .main-nav {
+        display: none;
+    }
+    
+    .sidebar {
+        position: fixed;
+        left: -220px;
+        top: 60px;
+        bottom: 0;
+        width: 220px;
+        background: #fff;
+        z-index: 99;
+        transition: var(--transition);
+        padding: 16px;
+        box-shadow: var(--shadow);
+    }
+    
+    .sidebar.show {
+        left: 0;
+    }
+    
+    .main-layout {
+        padding: 16px;
+    }
+    
+    .settings-layout .settings-sidebar {
+        display: none;
+    }
+    
+    .settings-content {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        padding: 0 12px;
+    }
+    
+    .user-info span {
+        display: none;
+    }
+    
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .content-actions {
+        width: 100%;
+    }
+    
+    .content-actions .btn {
+        flex: 1;
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .search-box input {
+        flex: 1;
+        width: auto;
+    }
+    
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+    }
+    
+    .file-item {
+        padding: 12px;
+    }
+    
+    .file-icon {
+        font-size: 36px;
+    }
+    
+    .color-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .settings-actions {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-radius: 0;
+        margin: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-text {
+        font-size: 16px;
+    }
+    
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .file-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .breadcrumb {
+        font-size: 12px;
+    }
+    
+    .toast-container {
+        left: 10px;
+        right: 10px;
+    }
+    
+    .toast {
+        padding: 10px 16px;
+    }
+}
+
+@media (hover: none) {
+    .file-item,
+    .nav-link,
+    .settings-nav-item,
+    .btn {
+        min-height: 44px;
+    }
+    
+    .file-item:active {
+        background: var(--background-color);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --border-color: #333;
+    }
+    
+    .app-header,
+    .sidebar-nav,
+    .storage-info,
+    .toolbar,
+    .file-manager,
+    .modal-content,
+    .settings-section,
+    .settings-nav {
+        background: #2d2d2d;
+    }
+    
+    .btn-secondary {
+        background: #2d2d2d;
+        border-color: #444;
+        color: #e0e0e0;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        background: #1a1a1a;
+        border-color: #444;
+        color: #e0e0e0;
+    }
+}

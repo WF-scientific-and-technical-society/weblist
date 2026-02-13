@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60">
+  <rect x="5" y="10" width="40" height="40" rx="8" fill="#1890ff"/>
+  <path d="M15 30 L25 40 L35 20" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="55" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#1890ff">个人网盘</text>
+</svg>

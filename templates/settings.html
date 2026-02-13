@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置 - 个人网盘</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/themes.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-text">个人网盘</span>
+                </a>
+                <nav class="main-nav">
+                    <a href="/" class="nav-item">文件</a>
+                    <a href="/settings" class="nav-item active">设置</a>
+                </nav>
+                <div class="user-info">
+                    <span id="userDisplay">管理员</span>
+                    <button class="btn btn-sm" id="logoutBtn">退出</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-layout settings-layout">
+            <aside class="settings-sidebar">
+                <nav class="settings-nav">
+                    <a href="#general" class="settings-nav-item active" data-section="general">
+                        <span class="icon">⚙️</span>
+                        <span class="text">基础设置</span>
+                    </a>
+                    <a href="#theme" class="settings-nav-item" data-section="theme">
+                        <span class="icon">🎨</span>
+                        <span class="text">主题设置</span>
+                    </a>
+                    <a href="#layout" class="settings-nav-item" data-section="layout">
+                        <span class="icon">📐</span>
+                        <span class="text">布局设置</span>
+                    </a>
+                    <a href="#upload" class="settings-nav-item" data-section="upload">
+                        <span class="icon">📤</span>
+                        <span class="text">上传设置</span>
+                    </a>
+                    <a href="#features" class="settings-nav-item" data-section="features">
+                        <span class="icon">✨</span>
+                        <span class="text">功能开关</span>
+                    </a>
+                    <a href="#backup" class="settings-nav-item" data-section="backup">
+                        <span class="icon">💾</span>
+                        <span class="text">备份恢复</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <main class="main-content settings-content">
+                <section class="settings-section" id="general">
+                    <h2 class="section-title">基础设置</h2>
+                    <div class="settings-card">
+                        <div class="form-group">
+                            <label>网站标题</label>
+                            <input type="text" id="siteTitle" data-config="site.title">
+                        </div>
+                        <div class="form-group">
+                            <label>网站描述</label>
+                            <textarea id="siteDescription" data-config="site.description" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>关键词（逗号分隔）</label>
+                            <input type="text" id="siteKeywords" data-config="site.keywords">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-section" id="theme" style="display:none;">
+                    <h2 class="section-title">主题设置</h2>
+                    <div class="settings-card">
+                        <div class="theme-preview">
+                            <div class="preview-box" id="themePreview">
+                                <div class="preview-header">预览标题</div>
+                                <div class="preview-content">
+                                    <div class="preview-button">按钮</div>
+                                    <div class="preview-text">文本内容</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="color-grid">
+                            <div class="form-group">
+                                <label>主色调</label>
+                                <div class="color-input">
+                                    <input type="color" id="primaryColor" data-config="theme.primary_color">
+                                    <input type="text" id="primaryColorText" data-config="theme.primary_color">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>次要颜色</label>
+                                <div class="color-input">
+                                    <input type="color" id="secondaryColor" data-config="theme.secondary_color">
+                                    <input type="text" id="secondaryColorText" data-config="theme.secondary_color">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>背景颜色</label>
+                                <div class="color-input">
+                                    <input type="color" id="backgroundColor" data-config="theme.background_color">
+                                    <input type="text" id="backgroundColorText" data-config="theme.background_color">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>文字颜色</label>
+                                <div class="color-input">
+                                    <input type="color" id="textColor" data-config="theme.text_color">
+                                    <input type="text" id="textColorText" data-config="theme.text_color">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>字体</label>
+                            <select id="fontFamily" data-config="theme.font_family">
+                                <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">系统默认</option>
+                                <option value="'Microsoft YaHei', sans-serif">微软雅黑</option>
+                                <option value="'PingFang SC', sans-serif">苹方</option>
+                                <option value="Arial, sans-serif">Arial</option>
+                            </select>
+                        </div>
+                        <div class="theme-presets">
+                            <label>预设主题</label>
+                            <div class="preset-grid">
+                                <button class="preset-btn" data-preset="default">默认蓝</button>
+                                <button class="preset-btn" data-preset="green">清新绿</button>
+                                <button class="preset-btn" data-preset="purple">优雅紫</button>
+                                <button class="preset-btn" data-preset="dark">深色模式</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-section" id="layout" style="display:none;">
+                    <h2 class="section-title">布局设置</h2>
+                    <div class="settings-card">
+                        <div class="form-group">
+                            <label>头部HTML</label>
+                            <textarea id="headerHtml" data-config="layout.header_html" rows="4" class="code-editor"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>底部HTML</label>
+                            <textarea id="footerHtml" data-config="layout.footer_html" rows="4" class="code-editor"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>自定义CSS</label>
+                            <textarea id="customCss" data-config="layout.custom_css" rows="6" class="code-editor"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>最大宽度</label>
+                            <input type="text" id="maxWidth" data-config="layout.max_width">
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="showFooter" data-config="layout.show_footer">
+                                显示页脚
+                            </label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="showBreadcrumb" data-config="layout.show_breadcrumb">
+                                显示面包屑导航
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-section" id="upload" style="display:none;">
+                    <h2 class="section-title">上传设置</h2>
+                    <div class="settings-card">
+                        <div class="form-group">
+                            <label>最大文件大小（字节）</label>
+                            <input type="number" id="maxFileSize" data-config="upload.max_file_size">
+                            <small>当前: <span id="maxFileSizeDisplay">2GB</span></small>
+                        </div>
+                        <div class="form-group">
+                            <label>允许的文件类型（逗号分隔）</label>
+                            <input type="text" id="allowedTypes" data-config="upload.allowed_types">
+                            <small>例如: jpg, png, pdf, zip</small>
+                        </div>
+                        <div class="form-group">
+                            <label>分块大小（字节）</label>
+                            <input type="number" id="chunkSize" data-config="upload.chunk_size">
+                        </div>
+                        <div class="form-group">
+                            <label>最大并发数</label>
+                            <input type="number" id="maxConcurrent" data-config="upload.max_concurrent" min="1" max="10">
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="autoStart" data-config="upload.auto_start">
+                                自动开始上传
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-section" id="features" style="display:none;">
+                    <h2 class="section-title">功能开关</h2>
+                    <div class="settings-card">
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="enableSearch" data-config="features.enable_search">
+                                启用搜索功能
+                            </label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="enableShare" data-config="features.enable_share">
+                                启用分享功能
+                            </label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="enablePreview" data-config="features.enable_preview">
+                                启用预览功能
+                            </label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="enableDragDrop" data-config="features.enable_drag_drop">
+                                启用拖拽上传
+                            </label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="enableContextMenu" data-config="features.enable_context_menu">
+                                启用右键菜单
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-section" id="backup" style="display:none;">
+                    <h2 class="section-title">备份恢复</h2>
+                    <div class="settings-card">
+                        <div class="backup-actions">
+                            <button class="btn btn-primary" id="createBackupBtn">创建备份</button>
+                            <button class="btn btn-secondary" id="restoreDefaultBtn">恢复默认</button>
+                        </div>
+                        <div class="backup-list" id="backupList">
+                            <div class="loading">加载中...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="settings-actions">
+                    <button class="btn btn-secondary" id="resetBtn">重置更改</button>
+                    <button class="btn btn-primary" id="saveBtn">保存设置</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>管理员登录</h3>
+                <button class="modal-close" id="closeLoginModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">登录</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/state.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/settings.js"></script>
+</body>
+</html>

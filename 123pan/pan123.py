@@ -400,10 +400,11 @@ class Pan123:
         else:
             print("退出分享")
 
-    def up_load(self, file_path):
+    def up_load(self, file_path, file_name=None):
         file_path = file_path.replace('"', "")
         file_path = file_path.replace("\\", "/")
-        file_name = file_path.split("/")[-1]
+        if file_name is None:
+            file_name = file_path.split("/")[-1]
         print("文件名:", file_name)
         if not os.path.exists(file_path):
             print("文件不存在，请检查路径是否正确")

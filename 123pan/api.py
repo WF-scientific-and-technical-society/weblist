@@ -315,13 +315,14 @@ def share(path):
     except Exception as e:
         return {"error": str(e)}
 
-def upload(local_path, remote_path="/"):
+def upload(local_path, remote_path="/", file_name=None):
     """
     上传文件
     
     参数:
         local_path: 本地文件路径
         remote_path: 远程路径，默认为根目录
+        file_name: 指定文件名（可选），如果不指定则从路径提取
     
     返回:
         {"status": "success"}
@@ -337,7 +338,7 @@ def upload(local_path, remote_path="/"):
         
         pan = _get_pan_instance()
         pan.parent_file_id = folder_id
-        pan.up_load(local_path)
+        pan.up_load(local_path, file_name)
         
         return {"status": "success"}
     except Exception as e:

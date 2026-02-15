@@ -420,7 +420,7 @@ def upload_file():
             tmp_path = tmp.name
         
         try:
-            result = pan_api.upload(tmp_path, remote_path)
+            result = pan_api.upload(tmp_path, remote_path, file.filename)
         finally:
             os.unlink(tmp_path)
         
